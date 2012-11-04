@@ -12,7 +12,7 @@ $messages_subjects = array(
 	'Curabitur nec tellus. In semper',
 	'Proin tempus porta dui',
 	'Nam gravida tempus nibh',
-	'Duis ultricess'
+	'Duis ultricess',
 );
 
 $messages_content = array(

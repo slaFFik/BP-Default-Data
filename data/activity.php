@@ -120,5 +120,5 @@ $activity = array(
     'http://www.youtube.com/watch?v=Ac0miuyXV4Q',
     'WordPress is web software you can use to create a beautiful website or blog. We like to say that WordPress is both free and priceless at the same time.',
     'BuddyPress is completely free and open source. Unlike hosted services, BuddyPress allows you to stay in control of your site and create a totally customized, unique experience.',
-    'http://vimeo.com/28926706'
+    'http://vimeo.com/28926706',
 );
