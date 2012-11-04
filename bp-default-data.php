@@ -55,9 +55,8 @@ function bpdd_admin_page_content() {
 		$g_activity = false; 
 		$g_members  = false; 
 
-		// Validate nonce before we do anything
-		if ( ! wp_verify_nonce( 'bpdd-admin' ) )
-			wp_die( __( 'Cheatin&#8217; uh?', 'bpdd' ) );
+		// Check nonce before we do anything
+		check_admin_referer( 'bpdd-admin' );
 
 		// Import users
 		if ( isset( $_POST['bpdd']['import-users'] ) ) {
