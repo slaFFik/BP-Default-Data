@@ -29,7 +29,7 @@ And turn off email notifications in profile - or you will spam yourself :)
 
 == Changelog ==
 
-= 1.0 =
+= 1.0 (all props to Paul Gibbs aka @pgibbs) =
 * Updates and fixes for the latest version of BuddyPress.
 * Fixes an issue with friend requests being incorrectly generated.
 
