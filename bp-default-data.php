@@ -31,7 +31,6 @@ function bpdd_admin_page_content() {
 	<?php screen_icon( 'buddypress' ); ?>
 
 	<style type="text/css">
-		ul.items{margin:20px}
 		ul li.users{border-bottom: 1px solid #EEEEEE;margin: 0 0 10px;padding: 5px 0}
 		ul li.users ul,ul li.groups ul{margin:5px 0 0 20px}
 		#message ul.results li{list-style:disc;margin-left:25px}
