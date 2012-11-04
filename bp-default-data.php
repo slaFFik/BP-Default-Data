@@ -22,7 +22,7 @@ function bpdd_admin_page() {
 	if ( ! is_super_admin() )
 		return;
 
-	$page = add_submenu_page( 'bp-general-settings', __( 'Default Data', 'bpdd' ), __( 'Default Data', 'bpdd' ), 'manage_options', 'bpdd-setup', 'bpdd_admin_page_content'  );
+	$page = add_options_page( __( 'BuddyPress Default Data', 'bpdd' ), __( 'BP Default Data', 'bpdd' ), 'manage_options', 'bpdd-setup', 'bpdd_admin_page_content' );
 	add_action( "admin_print_styles-$page", 'bp_core_add_admin_menu_styles' );
 }
 
