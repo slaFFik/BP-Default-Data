@@ -68,7 +68,7 @@ function bpdd_admin_page_content() {
 
 			if ( isset( $_POST['bpdd']['import-friends'] ) ) {
 				$friends             = bpdd_import_users_friends();
-				$imported['friends'] = sprintf( __( '%s friends connections', 'bpdd', number_format_i18n( $friends ) );
+				$imported['friends'] = sprintf( __( '%s friends connections', 'bpdd' ), number_format_i18n( $friends ) );
 			}
 
 			if ( isset( $_POST['bpdd']['import-profile'] ) ) {
