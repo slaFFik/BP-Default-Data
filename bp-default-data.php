@@ -22,7 +22,7 @@ function bpdd_admin_page() {
 	if ( ! is_super_admin() )
 		return;
 
-	add_options_page( __( 'BuddyPress Default Data', 'bpdd' ), __( 'BP Default Data', 'bpdd' ), 'manage_options', 'bpdd-setup', 'bpdd_admin_page_content' );
+	add_management_page( __( 'BuddyPress Default Data', 'bpdd' ), __( 'BP Default Data', 'bpdd' ), 'manage_options', 'bpdd-setup', 'bpdd_admin_page_content' );
 }
 
 function bpdd_admin_page_content() {
