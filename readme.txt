@@ -1,9 +1,9 @@
 === BuddyPress Default Data ===
 Contributors: slaFFik
 Tags: buddypress, members, groups, bulk, messages, activity, forums, posts
-Requires at least: WordPress 3.2.1 and BuddyPress 1.5
-Tested up to: WordPress 3.2.1 and BuddyPress 1.5
-Stable tag: 0.8
+Requires at least: WordPress 3.2.1 and BuddyPress 1.6.2
+Tested up to: WordPress 3.5 and BuddyPress 1.6.2
+Stable tag: 1.0
 
 Plugin will create lots of users, messages, friends connections, groups, topics, activity items - useful for testing purpose.
 
@@ -28,6 +28,10 @@ And turn off email notifications in profile - or you will spam yourself :)
 1. Admin Page with Import Status
 
 == Changelog ==
+
+= 1.0 =
+* Updates and fixes for the latest version of BuddyPress.
+* Fixes an issue with friend requests being incorrectly generated.
 
 = 0.8 =
 * 0.6 + personal (0.1) and groups (0.1) activities = 0.8
