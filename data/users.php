@@ -1,4 +1,7 @@
 <?php
+// Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 $users_data = array(
 	0 => array(
 				'login' => 'antawn',

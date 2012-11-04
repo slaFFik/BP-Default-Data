@@ -1,4 +1,7 @@
 <?php
+// Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 $groups = array(
 	0 => array(
 				'name' => 'Gone in 60 Seconds',
