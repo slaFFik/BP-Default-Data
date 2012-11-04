@@ -4,7 +4,7 @@
 * Plugin URI:  http://ovirium.com
 * Description: Plugin will create lots of users, groups, topics, activity items - useful for testing purpose.
 * Author:      slaFFik
-* Version:     0.8
+* Version:     1.0
 * Author URI:  http://cosydale.com
 */
 
