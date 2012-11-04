@@ -342,11 +342,8 @@ function bpdd_import_users_friends() {
 		if ( BP_Friends_Friendship::check_is_friend( $user_one, $user_two ) == 'not_friends' ) {
 
 			// make them friends
-			if ( friends_add_friend( $user_one, $user_two, true ) ) {
-				// update counters for front-end
-				friends_update_friend_totals( $user_one, $user_two );
+			if ( friends_add_friend( $user_one, $user_two, true ) ) 
 				$con++;
-			}
 		}
 	}
 
