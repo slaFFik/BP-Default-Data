@@ -254,7 +254,7 @@ function bpdd_import_users() {
 
 		bp_update_user_meta( $cur, 'last_activity', bpdd_get_random_date( 5 ) );
 		bp_update_user_meta( $cur, 'notification_messages_new_message', 'no' );
-		$users[]->ID = $cur;
+		$users[] = $cur;
 	}
 
 	return $users;
@@ -474,21 +474,39 @@ function bpdd_import_groups_forums() {
 function bpdd_clear_db() {
 	global $wpdb;
 
-	$sqls[] = "TRUNCATE TABLE {$wpdb->prefix}bp_activity;";
-	$sqls[] = "TRUNCATE TABLE {$wpdb->prefix}bp_activity_meta;";
-	$sqls[] = "TRUNCATE TABLE {$wpdb->prefix}bp_groups;";
-	$sqls[] = "TRUNCATE TABLE {$wpdb->prefix}bp_groups_members;";
-	$sqls[] = "TRUNCATE TABLE {$wpdb->prefix}bp_groups_groupmeta;";
-	$sqls[] = "TRUNCATE TABLE {$wpdb->prefix}bb_posts;";
-	$sqls[] = "TRUNCATE TABLE {$wpdb->prefix}bp_messages_recipients;";
-	$sqls[] = "TRUNCATE TABLE {$wpdb->prefix}bp_messages_messages;";
-	$sqls[] = "TRUNCATE TABLE {$wpdb->prefix}bp_notifications;";
-	$sqls[] = "TRUNCATE TABLE {$wpdb->prefix}bp_friends;";
+	$prefix = bp_core_get_table_prefix();
+
+	if ( bp_is_active( 'activity' ) ) {
+		$sqls[] = "TRUNCATE TABLE {$prefix}bp_activity;";
+		$sqls[] = "TRUNCATE TABLE {$prefix}bp_activity_meta;";
+	}
+
+	if ( bp_is_active( 'groups' ) ) {
+		$sqls[] = "TRUNCATE TABLE {$prefix}bp_groups;";
+		$sqls[] = "TRUNCATE TABLE {$prefix}bp_groups_members;";
+		$sqls[] = "TRUNCATE TABLE {$prefix}bp_groups_groupmeta;";
+	}
+
+	if ( bp_is_active( 'messages' ) ) {
+		$sqls[] = "TRUNCATE TABLE {$prefix}bp_messages_recipients;";
+		$sqls[] = "TRUNCATE TABLE {$prefix}bp_messages_messages;";
+	}
+
+	if ( bp_is_active( 'friends' ) )
+		$sqls[] = "TRUNCATE TABLE {$prefix}bp_friends;";
+
+	if ( bp_is_active( 'xprofile' ) )
+		$sqls[] = "DELETE FROM {$prefix}bp_xprofile_data WHERE user_id > 1;";
+
+	if ( bp_is_active( 'forums' ) && bp_forums_is_installed_correctly() ) {
+		$sqls[] = "TRUNCATE TABLE {$prefix}bb_posts;";
+		$sqls[] = "DELETE FROM {$prefix}bb_forums WHERE forum_id > 1;";
+	}
+
+	$sqls[] = "TRUNCATE TABLE {$prefix}bp_notifications;";
 	$sqls[] = "DELETE FROM {$wpdb->prefix}users WHERE ID > 1;";
 	$sqls[] = "DELETE FROM {$wpdb->prefix}usermeta WHERE user_id > 1;";
 	$sqls[] = "DELETE FROM {$wpdb->prefix}usermeta WHERE meta_key = 'total_friend_count';";
-	$sqls[] = "DELETE FROM {$wpdb->prefix}bp_xprofile_data WHERE user_id > 1;";
-	$sqls[] = "DELETE FROM {$wpdb->prefix}bb_forums WHERE forum_id > 1;";
 
 	foreach( $sqls as $sql )
 		$wpdb->query( $sql );
