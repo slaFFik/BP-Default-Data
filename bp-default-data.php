@@ -4,19 +4,19 @@
 * Plugin URI:  http://ovirium.com
 * Description: Plugin will create lots of users, groups, topics, activity items - useful for testing purpose.
 * Author:      slaFFik
-* Version:     1.0.2
+* Version:     1.0.3
 * Author URI:  http://ovirium.com
 */
 
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-define( 'BPDD_VERSION', '1.0.2' );
+define( 'BPDD_VERSION', '1.0.3' );
 
+add_action( 'bp_init', 'bpdd_init' );
 function bpdd_init() {
     add_action( bp_core_admin_hook(), 'bpdd_admin_page', 99 );
 }
-add_action( 'bp_init', 'bpdd_init' );
 
 function bpdd_admin_page() {
     if ( ! is_super_admin() )
@@ -249,7 +249,7 @@ function bpdd_import_users() {
     $users      = array();
 
     require( dirname( __FILE__ ) . '/data/users.php' );
-
+    global $wpdb;
     foreach ( $users_data as $user ) {
         $cur = wp_insert_user( array(
             'user_login'      => $user['login'],
@@ -258,6 +258,7 @@ function bpdd_import_users() {
             'user_email'      => $user['email'],
             'user_registered' => bpdd_get_random_date( 45, 1 ),
         )) ;
+        $query[] = $wpdb->last_query;
 
         bp_update_user_meta( $cur, 'last_activity', bpdd_get_random_date( 5 ) );
         bp_update_user_meta( $cur, 'notification_messages_new_message', 'no' );
