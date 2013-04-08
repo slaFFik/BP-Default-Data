@@ -4,14 +4,14 @@
 * Plugin URI:  http://ovirium.com
 * Description: Plugin will create lots of users, groups, topics, activity items - useful for testing purpose.
 * Author:      slaFFik
-* Version:     1.0.1
+* Version:     1.0.2
 * Author URI:  http://ovirium.com
 */
 
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-define( 'BPDD_VERSION', '1.0.1' );
+define( 'BPDD_VERSION', '1.0.2' );
 
 function bpdd_init() {
     add_action( bp_core_admin_hook(), 'bpdd_admin_page', 99 );
@@ -529,8 +529,8 @@ function bpdd_get_random_groups_ids( $count = 1, $output = 'array' ) {
         $limit = ' LIMIT ' . $count;
 
     $groups = $wpdb->get_results($wpdb->prepare(
-                            "SELECT id FROM {$wpdb->prefix}bp_groups ORDER BY rand() %s",
-                            $limit));
+                            "SELECT id FROM {$wpdb->prefix}bp_groups ORDER BY rand() {$limit}",
+                            false));
 
     // reformat the array
     foreach( $groups as $group ) {
@@ -552,8 +552,8 @@ function bpdd_get_random_users_ids( $count = 1, $output = 'array' ) {
         $limit = ' LIMIT ' . $count;
 
     $users = $wpdb->get_results($wpdb->prepare(
-                        "SELECT ID FROM {$wpdb->prefix} users ORDER BY rand() %s",
-                        $limit));
+                        "SELECT ID FROM {$wpdb->users} ORDER BY rand() {$limit}",
+                        false));
 
     // reformat the array
     foreach( $users as $user )
