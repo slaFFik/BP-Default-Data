@@ -4,19 +4,19 @@
 * Plugin URI:  http://ovirium.com
 * Description: Plugin will create lots of users, groups, topics, activity items - useful for testing purpose.
 * Author:      slaFFik
-* Version:     1.0.1
+* Version:     1.0.4
 * Author URI:  http://ovirium.com
 */
 
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-define( 'BPDD_VERSION', '1.0.1' );
+define( 'BPDD_VERSION', '1.0.4' );
 
+add_action( 'bp_init', 'bpdd_init' );
 function bpdd_init() {
     add_action( bp_core_admin_hook(), 'bpdd_admin_page', 99 );
 }
-add_action( 'bp_init', 'bpdd_init' );
 
 function bpdd_admin_page() {
     if ( ! is_super_admin() )
@@ -249,7 +249,7 @@ function bpdd_import_users() {
     $users      = array();
 
     require( dirname( __FILE__ ) . '/data/users.php' );
-
+    global $wpdb;
     foreach ( $users_data as $user ) {
         $cur = wp_insert_user( array(
             'user_login'      => $user['login'],
@@ -258,9 +258,18 @@ function bpdd_import_users() {
             'user_email'      => $user['email'],
             'user_registered' => bpdd_get_random_date( 45, 1 ),
         )) ;
+        $query[] = $wpdb->last_query;
 
-        bp_update_user_meta( $cur, 'last_activity', bpdd_get_random_date( 5 ) );
+        // BuddyPress 1.9+
+        if( function_exists('bp_update_user_last_activity')){
+            bp_update_user_last_activity( $cur, bpdd_get_random_date( 5 ) );
+        } else {
+            // BuddyPress 1.8.x and below
+            bp_update_user_meta( $cur, 'last_activity', bpdd_get_random_date( 5 ) );
+        }
+
         bp_update_user_meta( $cur, 'notification_messages_new_message', 'no' );
+
         $users[] = $cur;
     }
 
@@ -369,8 +378,9 @@ function bpdd_import_groups( $users = false ) {
     require( dirname( __FILE__ ) . '/data/groups.php' );
 
     foreach ( $groups as $group ) {
+        $creator_id = is_object($users[array_rand( $users )]) ? $users[array_rand( $users )]->ID : $users[array_rand( $users )];
         $cur = groups_create_group( array(
-            'creator_id'   => $users[array_rand( $users )]->ID,
+            'creator_id'   => $creator_id,
             'name'         => $group['name'],
             'description'  => $group['description'],
             'slug'         => groups_check_slug( sanitize_title( esc_attr( $group['name'] ) ) ),
@@ -529,8 +539,8 @@ function bpdd_get_random_groups_ids( $count = 1, $output = 'array' ) {
         $limit = ' LIMIT ' . $count;
 
     $groups = $wpdb->get_results($wpdb->prepare(
-                            "SELECT id FROM {$wpdb->prefix}bp_groups ORDER BY rand() %s",
-                            $limit));
+                            "SELECT id FROM {$wpdb->prefix}bp_groups ORDER BY rand() {$limit}",
+                            false));
 
     // reformat the array
     foreach( $groups as $group ) {
@@ -552,8 +562,8 @@ function bpdd_get_random_users_ids( $count = 1, $output = 'array' ) {
         $limit = ' LIMIT ' . $count;
 
     $users = $wpdb->get_results($wpdb->prepare(
-                        "SELECT ID FROM {$wpdb->prefix} users ORDER BY rand() %s",
-                        $limit));
+                        "SELECT ID FROM {$wpdb->users} ORDER BY rand() {$limit}",
+                        false));
 
     // reformat the array
     foreach( $users as $user )
