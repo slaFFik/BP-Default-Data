@@ -2,8 +2,13 @@
 Contributors: slaFFik
 Tags: buddypress, members, groups, bulk, messages, activity, forums, posts
 Requires at least: WordPress 3.2.1 and BuddyPress 1.6.2
+<<<<<<< HEAD
 Tested up to: WordPress 3.8.1 and BuddyPress 2.0
 Stable tag: 1.0.4
+=======
+Tested up to: WordPress 3.5 and BuddyPress 1.6.5
+Stable tag: 1.0.3
+>>>>>>> 04fa6efcde9281893179f93c597d3a48410cdeb8
 
 Plugin will create lots of users, messages, friends connections, groups, topics, activity items - useful for testing purpose.
 
@@ -31,15 +36,22 @@ And turn off email notifications in profile - or you will spam yourself :)
 
 == Changelog ==
 
+<<<<<<< HEAD
 = 1.0.3 (01.04.2014) =
 * BuddyPress 2.0 support `last_activity` speed improvement
 * Fixed a notice
 
+=======
+>>>>>>> 04fa6efcde9281893179f93c597d3a48410cdeb8
 = 1.0.3 (09.04.2013) =
 * Now all imported users have avatar
 
 = 1.0.2 (08.04.2013) =
+<<<<<<< HEAD
 * Fixed import errors
+=======
+* Fixing import errors
+>>>>>>> 04fa6efcde9281893179f93c597d3a48410cdeb8
 
 = 1.0.1 (15.12.2012) =
 * WordPress 3.5 compatibility
