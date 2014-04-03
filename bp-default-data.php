@@ -4,22 +4,14 @@
 * Plugin URI:  http://ovirium.com
 * Description: Plugin will create lots of users, groups, topics, activity items - useful for testing purpose.
 * Author:      slaFFik
-<<<<<<< HEAD
 * Version:     1.0.4
-=======
-* Version:     1.0.3
->>>>>>> 04fa6efcde9281893179f93c597d3a48410cdeb8
 * Author URI:  http://ovirium.com
 */
 
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-<<<<<<< HEAD
 define( 'BPDD_VERSION', '1.0.4' );
-=======
-define( 'BPDD_VERSION', '1.0.3' );
->>>>>>> 04fa6efcde9281893179f93c597d3a48410cdeb8
 
 add_action( 'bp_init', 'bpdd_init' );
 function bpdd_init() {
@@ -267,7 +259,6 @@ function bpdd_import_users() {
             'user_registered' => bpdd_get_random_date( 45, 1 ),
         )) ;
         $query[] = $wpdb->last_query;
-<<<<<<< HEAD
 
         // BuddyPress 1.9+
         if( function_exists('bp_update_user_last_activity')){
@@ -276,8 +267,6 @@ function bpdd_import_users() {
             // BuddyPress 1.8.x and below
             bp_update_user_meta( $cur, 'last_activity', bpdd_get_random_date( 5 ) );
         }
-=======
->>>>>>> 04fa6efcde9281893179f93c597d3a48410cdeb8
 
         bp_update_user_meta( $cur, 'notification_messages_new_message', 'no' );
 
