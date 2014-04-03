@@ -31,7 +31,7 @@ And turn off email notifications in profile - or you will spam yourself :)
 
 == Changelog ==
 
-= 1.0.3 (01.04.2014) =
+= 1.0.4 (03.04.2014) =
 * BuddyPress 2.0 support `last_activity` speed improvement
 * Fixed a notice
 
