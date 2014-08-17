@@ -32,8 +32,7 @@ function bpdd_admin_page() {
     );
 }
 
-function bpdd_admin_page_content() {
-?>
+function bpdd_admin_page_content() { ?>
     <div class="wrap">
     <?php screen_icon( 'buddypress' ); ?>
 
@@ -53,6 +52,7 @@ function bpdd_admin_page_content() {
     if ( isset( $_POST['bpdd-admin-submit'] ) ) {
         // default values
         $users      = false;
+        $imported   = array();
         $profile    = false;
         $messages   = false;
         $activity   = false;
@@ -283,7 +283,10 @@ function bpdd_import_users_profile() {
 function bpdd_import_users_messages() {
     $messages = array();
 
+    /** @var $messages_subjects Array */
+    /** @var $messages_content Array */
     require( dirname( __FILE__ ) . '/data/messages.php' );
+
 
     // first level messages
     for ( $i = 0; $i < 33; $i++ ) {
@@ -330,6 +333,7 @@ function bpdd_import_users_messages() {
 function bpdd_import_users_activity() {
     $users = bpdd_get_random_users_ids( 0 );
 
+    /** @var $activity Array */
     require( dirname( __FILE__ ) . '/data/activity.php' );
 
     for( $i = 0, $count = 0; $i < 75; $i++ ) {
@@ -406,6 +410,7 @@ function bpdd_import_groups_activity() {
     $users  = bpdd_get_random_users_ids( 0 );
     $groups = bpdd_get_random_groups_ids( 0 );
 
+    /** @var $activity Array */
     require( dirname( __FILE__ ) . '/data/activity.php' );
 
     for ( $i = 0, $count = 0; $i < 150; $i++ ) {
@@ -489,6 +494,7 @@ function bpdd_import_groups_forums() {
 *  Helpers
 */
 function bpdd_clear_db() {
+    /** @var $wpdb WPDB */
     global $wpdb;
 
     $prefix = bp_core_get_table_prefix();
@@ -530,8 +536,8 @@ function bpdd_clear_db() {
 }
 
 function bpdd_get_random_groups_ids( $count = 1, $output = 'array' ) {
+    /** @var $wpdb WPDB */
     global $wpdb;
-    $groups = array();
     $data   = array();
     $limit  = '';
 
@@ -552,6 +558,7 @@ function bpdd_get_random_groups_ids( $count = 1, $output = 'array' ) {
 }
 
 function bpdd_get_random_users_ids( $count = 1, $output = 'array' ) {
+    /** @var $wpdb WPDB */
     global $wpdb;
     $limit = '';
     $data  = array();
@@ -566,10 +573,11 @@ function bpdd_get_random_users_ids( $count = 1, $output = 'array' ) {
     foreach( $users as $user )
         $data[] = $user->ID;
 
-    if ( $output == 'array' )
+    if ( $output == 'array' ) {
         return $data;
-    elseif ( $output == 'string' )
-        return implode( ',', $data );
+    } elseif ( $output == 'string' ) {
+        return implode(',', $data);
+    }
 }
 
 function bpdd_get_random_date( $days_from = 30, $days_to = 0 ) {
