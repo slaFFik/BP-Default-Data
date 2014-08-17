@@ -538,9 +538,7 @@ function bpdd_get_random_groups_ids( $count = 1, $output = 'array' ) {
     if( $count > 0 )
         $limit = ' LIMIT ' . $count;
 
-    $groups = $wpdb->get_results($wpdb->prepare(
-                            "SELECT id FROM {$wpdb->prefix}bp_groups ORDER BY rand() {$limit}",
-                            false));
+    $groups = $wpdb->get_results( "SELECT id FROM {$wpdb->prefix}bp_groups ORDER BY rand() {$limit}" );
 
     // reformat the array
     foreach( $groups as $group ) {
@@ -555,15 +553,14 @@ function bpdd_get_random_groups_ids( $count = 1, $output = 'array' ) {
 
 function bpdd_get_random_users_ids( $count = 1, $output = 'array' ) {
     global $wpdb;
-    $users = array();
     $limit = '';
+    $data  = array();
 
-    if( $count > 0 )
+    if( $count > 0 ){
         $limit = ' LIMIT ' . $count;
+    }
 
-    $users = $wpdb->get_results($wpdb->prepare(
-                        "SELECT ID FROM {$wpdb->users} ORDER BY rand() {$limit}",
-                        false));
+    $users = $wpdb->get_results( "SELECT ID FROM {$wpdb->users} ORDER BY rand() {$limit}" );
 
     // reformat the array
     foreach( $users as $user )
