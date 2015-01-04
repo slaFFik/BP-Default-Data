@@ -31,7 +31,7 @@ And turn off email notifications in profile - or you will spam yourself :)
 
 == Changelog ==
 
-= 1.0.6 (04.01.2014) =
+= 1.0.6 (04.01.2015) =
 * Latest WordPress and BuddyPress compatibility checks
 * Import first/last names correctly
 
