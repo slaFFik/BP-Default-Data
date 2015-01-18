@@ -85,14 +85,14 @@ function bpdd_admin_page_content() { ?>
 				$users             = bpdd_import_users();
 				$imported['users'] = sprintf( __( '%s new users', 'bpdd' ), number_format_i18n( count( $users ) ) );
 
-				if ( isset( $_POST['bpdd']['import-friends'] ) ) {
-					$friends             = bpdd_import_users_friends();
-					$imported['friends'] = sprintf( __( '%s friends connections', 'bpdd' ), number_format_i18n( $friends ) );
-				}
-
 				if ( isset( $_POST['bpdd']['import-profile'] ) ) {
 					$profile             = bpdd_import_users_profile();
 					$imported['profile'] = sprintf( __( '%s profile entries', 'bpdd' ), number_format_i18n( $profile ) );
+				}
+
+				if ( isset( $_POST['bpdd']['import-friends'] ) ) {
+					$friends             = bpdd_import_users_friends();
+					$imported['friends'] = sprintf( __( '%s friends connections', 'bpdd' ), number_format_i18n( $friends ) );
 				}
 
 				if ( isset( $_POST['bpdd']['import-messages'] ) ) {
@@ -179,15 +179,16 @@ function bpdd_admin_page_content() { ?>
 
 			<ul class="items">
 				<li class="users">
-					<label for="import-users"><input type="checkbox" name="bpdd[import-users]" id="import-users"
-					                                 value="1"/>
-						&nbsp; <?php _e( 'Do you want to import users?', 'bpdd' ); ?></label>
+					<label for="import-users">
+						<input type="checkbox" name="bpdd[import-users]" id="import-users" value="1"/>
+						&nbsp; <?php _e( 'Do you want to import users?', 'bpdd' ); ?>
+					</label>
 					<ul>
 
 						<?php if ( bp_is_active( 'xprofile' ) ) : ?>
 							<li>
-								<label for="import-profile"><input type="checkbox" disabled name="bpdd[import-profile]"
-								                                   id="import-profile" value="1"/>
+								<label for="import-profile">
+									<input type="checkbox" name="bpdd[import-profile]" id="import-profile" value="1"/>
 									&nbsp; <?php _e( 'Do you want to import users profile data (profile groups and fields will be created)?', 'bpdd' ); ?>
 								</label>
 							</li>
@@ -195,8 +196,8 @@ function bpdd_admin_page_content() { ?>
 
 						<?php if ( bp_is_active( 'friends' ) ) : ?>
 							<li>
-								<label for="import-friends"><input type="checkbox" name="bpdd[import-friends]"
-								                                   id="import-friends" value="1"/>
+								<label for="import-friends">
+									<input type="checkbox" name="bpdd[import-friends]" id="import-friends" value="1"/>
 									&nbsp; <?php _e( 'Do you want to create some friends connections between imported users?', 'bpdd' ); ?>
 								</label>
 							</li>
@@ -204,8 +205,8 @@ function bpdd_admin_page_content() { ?>
 
 						<?php if ( bp_is_active( 'activity' ) ) : ?>
 							<li>
-								<label for="import-activity"><input type="checkbox" name="bpdd[import-activity]"
-								                                    id="import-activity" value="1"/>
+								<label for="import-activity">
+									<input type="checkbox" name="bpdd[import-activity]" id="import-activity" value="1"/>
 									&nbsp; <?php _e( 'Do you want to import activity posts for users?', 'bpdd' ); ?>
 								</label>
 							</li>
@@ -213,8 +214,8 @@ function bpdd_admin_page_content() { ?>
 
 						<?php if ( bp_is_active( 'messages' ) ) : ?>
 							<li>
-								<label for="import-messages"><input type="checkbox" name="bpdd[import-messages]"
-								                                    id="import-messages" value="1"/>
+								<label for="import-messages">
+									<input type="checkbox" name="bpdd[import-messages]" id="import-messages" value="1"/>
 									&nbsp; <?php _e( 'Do you want to import private messages between users?', 'bpdd' ); ?>
 								</label>
 							</li>
@@ -331,7 +332,70 @@ function bpdd_import_users() {
 }
 
 function bpdd_import_users_profile() {
-	return true;
+	/** @var $wpdb WPDB */
+	global $bp, $wpdb;
+	$users = bpdd_get_random_users_ids( 0 );
+	$data  = array();
+
+	$xprofile_structure = require_once( dirname( __FILE__ ) . '/data/xprofile_structure.php' );
+
+	// first import profile groups
+	foreach ( $xprofile_structure as $group_type => $group_data ) {
+		$group_id = xprofile_insert_field_group( array(
+			                                         'name'        => $group_data['name'],
+			                                         'description' => $group_data['desc'],
+		                                         ) );
+
+		$data[ $group_id ] = array();
+
+		// then import fields
+		foreach ( $group_data['fields'] as $field_type => $field_data ) {
+			$field_id = xprofile_insert_field( array(
+				                                   'field_group_id' => $group_id,
+				                                   'parent_id'      => 0,
+				                                   'type'           => $field_type,
+				                                   'name'           => $field_data['name'],
+				                                   'description'    => $field_data['desc'],
+				                                   'is_required'    => $field_data['required'],
+				                                   'order_by'       => 'custom',
+			                                   ) );
+
+			if ( $field_id ) {
+				bp_xprofile_update_field_meta( $field_id, 'default_visibility', $field_data['default-visibility'] );
+
+				bp_xprofile_update_field_meta( $field_id, 'allow_custom_visibility', $field_data['allow-custom-visibility'] );
+
+				if ( ! empty( $field_data['options'] ) ) {
+					foreach ( $field_data['options'] as $option ) {
+						$option_id = xprofile_insert_field( array(
+							                                    'field_group_id'    => $group_id,
+							                                    'parent_id'         => $field_id,
+							                                    'type'              => 'option',
+							                                    'name'              => $option['name'],
+							                                    'can_delete'        => true,
+							                                    'is_default_option' => $option['is_default_option'],
+							                                    'option_order'      => $option['option_order'],
+						                                    ) );
+
+						$data[ $group_id ][ $field_id ][ $option_id ] = $option['name'];
+					}
+				} else {
+					$data[ $group_id ][ $field_id ] = array();
+				}
+			}
+		}
+	}
+
+	//print_var($data,1);
+
+	$xprofile_data = require_once( dirname( __FILE__ ) . '/data/xprofile_data.php' );
+
+	// now import profile fields data for all fields for each user
+	foreach ( $users as $user_id ) {
+
+	}
+
+	return count( $data );
 }
 
 function bpdd_import_users_messages() {
@@ -580,7 +644,10 @@ function bpdd_clear_db() {
 	}
 
 	if ( bp_is_active( 'xprofile' ) ) {
-		$sqls[] = "DELETE FROM {$prefix}bp_xprofile_data WHERE user_id > 1;";
+		$sqls[] = "DELETE FROM {$prefix}bp_xprofile_data WHERE user_id > 1 OR field_id > 1;";
+		$sqls[] = "DELETE FROM {$prefix}bp_xprofile_fields WHERE id > 1;";
+		$sqls[] = "DELETE FROM {$prefix}bp_xprofile_groups WHERE id > 1;";
+		$sqls[] = "DELETE FROM {$prefix}bp_xprofile_meta WHERE object_id > 1;";
 	}
 
 	if ( bp_is_active( 'forums' ) && bp_forums_is_installed_correctly() ) {
@@ -592,6 +659,8 @@ function bpdd_clear_db() {
 	$sqls[] = "DELETE FROM {$wpdb->prefix}users WHERE ID > 1;";
 	$sqls[] = "DELETE FROM {$wpdb->prefix}usermeta WHERE user_id > 1;";
 	$sqls[] = "DELETE FROM {$wpdb->prefix}usermeta WHERE meta_key = 'total_friend_count';";
+	$sqls[] = "DELETE FROM {$wpdb->prefix}usermeta WHERE meta_key = 'bp_latest_update';";
+	$sqls[] = "DELETE FROM {$wpdb->prefix}usermeta WHERE meta_key = 'last_activity';";
 
 	foreach ( $sqls as $sql ) {
 		$wpdb->query( $sql );
