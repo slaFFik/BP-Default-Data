@@ -2,9 +2,9 @@
 /**
  * Plugin Name: BuddyPress Default Data
  * Plugin URI:  http://ovirium.com
- * Description: Plugin will create lots of users, groups, topics, activity items - useful for testing purpose.
+ * Description: Plugin will create lots of users, groups, topics, activity items, profile data - useful for testing purpose.
  * Author:      slaFFik
- * Version:     1.0.6
+ * Version:     1.1
  * Author URI:  http://ovirium.com
  */
 
@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'BPDD_VERSION', '1.0.6' );
+define( 'BPDD_VERSION', '1.1' );
 
 function bpdd_init() {
 	add_action( bp_core_admin_hook(), 'bpdd_admin_page', 99 );
@@ -276,11 +276,16 @@ function bpdd_admin_page_content() { ?>
 				       value="<?php esc_attr_e( 'Clear BuddyPress Data', 'bpdd' ); ?>"/>
 			</p>
 
-			<p><?php _e( 'All users have the same password: <code>1234567890</code>', 'bpdd' ); ?></p>
+			<fieldset style="border: 1px solid #ccc;padding: 0 10px;">
+				<legend style="font-weight: bold;"><?php _e( 'Important Information', 'bpdd' ); ?></legend>
+				<p><?php _e( 'All users have the same password: <code>1234567890</code>', 'bpdd' ); ?></p>
 
-			<p><?php _e( 'Friends connections don\'t produce notifications, while messages importing do.', 'bpdd' ); ?></p>
+				<p><?php _e( 'Friends connections don\'t produce notifications, while messages importing do.', 'bpdd' ); ?></p>
 
-			<p><?php _e( 'Many thanks to <a href="http://imdb.com" target="_blank">IMDB.com</a> for movies titles (groups names), <a href="http://en.wikipedia.org" target="_blank">Wikipedia.org</a> (users names), <a href="http://en.wikipedia.org/wiki/Lorem_ipsum" target="_blank">Lorem Ipsum</a> (messages and forum posts), <a href="http://www.cs.virginia.edu/~robins/quotes.html">Dr. Gabriel Robins</a> (for a list of quotes collected by him), <a href="http://www.youtube.com/">Youtube</a> and <a href="http://vimeo.com/">Vimeo</a> (for videos).', 'bpdd' ); ?></p>
+				<p><?php _e( 'xProfile data importing doesn\'t produce activity feed records.', 'bpdd' ); ?></p>
+			</fieldset>
+
+			<p class="description"><?php _e( 'Many thanks to <a href="http://imdb.com" target="_blank">IMDB.com</a> for movies titles (groups names), <a href="http://en.wikipedia.org" target="_blank">Wikipedia.org</a> (users names), <a href="http://en.wikipedia.org/wiki/Lorem_ipsum" target="_blank">Lorem Ipsum</a> (messages and forum posts), <a href="http://www.cs.virginia.edu/~robins/quotes.html">Dr. Gabriel Robins</a> and <a href="http://en.proverbia.net/shortfamousquotes.asp">Proverbia</a> (for the lists of quotes), <a href="http://www.youtube.com/">YouTube</a> and <a href="http://vimeo.com/">Vimeo</a> (for videos).', 'bpdd' ); ?></p>
 
 			<?php wp_nonce_field( 'bpdd-admin' ); ?>
 
@@ -334,7 +339,6 @@ function bpdd_import_users() {
 function bpdd_import_users_profile() {
 	/** @var $wpdb WPDB */
 	global $bp, $wpdb;
-	$users = bpdd_get_random_users_ids( 0 );
 	$data  = array();
 
 	$xprofile_structure = require_once( dirname( __FILE__ ) . '/data/xprofile_structure.php' );
@@ -345,8 +349,6 @@ function bpdd_import_users_profile() {
 			                                         'name'        => $group_data['name'],
 			                                         'description' => $group_data['desc'],
 		                                         ) );
-
-		$data[ $group_id ] = array();
 
 		// then import fields
 		foreach ( $group_data['fields'] as $field_type => $field_data ) {
@@ -365,6 +367,9 @@ function bpdd_import_users_profile() {
 
 				bp_xprofile_update_field_meta( $field_id, 'allow_custom_visibility', $field_data['allow-custom-visibility'] );
 
+				$data[ $field_id ]['type'] = $field_type;
+
+				// finally import options
 				if ( ! empty( $field_data['options'] ) ) {
 					foreach ( $field_data['options'] as $option ) {
 						$option_id = xprofile_insert_field( array(
@@ -377,25 +382,46 @@ function bpdd_import_users_profile() {
 							                                    'option_order'      => $option['option_order'],
 						                                    ) );
 
-						$data[ $group_id ][ $field_id ][ $option_id ] = $option['name'];
+						$data[ $field_id ]['options'][ $option_id ] = $option['name'];
 					}
 				} else {
-					$data[ $group_id ][ $field_id ] = array();
+					$data[ $field_id ]['options'] = array();
 				}
 			}
 		}
 	}
 
-	//print_var($data,1);
-
 	$xprofile_data = require_once( dirname( __FILE__ ) . '/data/xprofile_data.php' );
+	$users = bpdd_get_random_users_ids( 0 );
 
 	// now import profile fields data for all fields for each user
+	$count = 0;
 	foreach ( $users as $user_id ) {
+		foreach ( $data as $field_id => $field_data ) {
+			switch ( $field_data['type'] ) {
+				case 'datebox':
+				case 'textarea':
+				case 'number':
+				case 'textbox':
+				case 'url':
+				case 'selectbox':
+				case 'radio':
+					if ( xprofile_set_field_data( $field_id, $user_id, $xprofile_data[ $field_data['type'] ][ array_rand( $xprofile_data[ $field_data['type'] ] ) ] ) ) {
+						$count ++;
+					}
+					break;
 
+				case 'checkbox':
+				case 'multiselectbox':
+					if ( xprofile_set_field_data( $field_id, $user_id, explode( ',', $xprofile_data[ $field_data['type'] ][ array_rand( $xprofile_data[ $field_data['type'] ] ) ] ) ) ) {
+						$count ++;
+					}
+					break;
+			}
+		}
 	}
 
-	return count( $data );
+	return $count;
 }
 
 function bpdd_import_users_messages() {
