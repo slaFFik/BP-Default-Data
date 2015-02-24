@@ -295,12 +295,10 @@ function bpdd_admin_page_content() { ?>
 <?php
 }
 
-/*
-*  Importer engine - USERS
-*/
+/**
+ *  Importer engine - USERS
+ */
 function bpdd_import_users() {
-	/** @var $wpdb WPDB */
-	global $wpdb;
 	$users = array();
 
 	$users_data = require_once( dirname( __FILE__ ) . '/data/users.php' );
@@ -313,7 +311,6 @@ function bpdd_import_users() {
 			                           'user_email'      => $user['email'],
 			                           'user_registered' => bpdd_get_random_date( 45, 1 ),
 		                           ) );
-		$query[] = $wpdb->last_query;
 
 		xprofile_set_field_data( 1, $user_id, $user['display_name'] );
 		$name = explode( ' ', $user['display_name'] );
