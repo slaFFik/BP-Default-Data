@@ -3,7 +3,7 @@ Contributors: slaFFik
 Tags: buddypress, members, groups, bulk, messages, activity, forums, posts
 Requires at least: WordPress 3.2.1 and BuddyPress 1.6.2
 Tested up to: 4.1 and BuddyPress 2.1.1
-Stable tag: 1.1
+Stable tag: 1.1.1
 
 Plugin will create lots of users, messages, friends connections, groups, topics, activity items, profile data - useful for testing purpose.
 
@@ -30,6 +30,9 @@ And turn off email notifications in profile - or you will spam yourself :)
 1. Admin Page with Import Status
 
 == Changelog ==
+
+= 1.1.1 (19.07.2015) =
+* Adding Composer support
 
 = 1.1 (20.01.2015) =
 * Import xProfile fields structure with all possible default types of fields
