@@ -1,0 +1,32 @@
+{
+    "name": "slaFFik/bp-default-data",
+    "description": "Create lots of users, messages, friends connections, groups, topics, activity items in BuddyPress - useful for testing purpose",
+    "type": "wordpress-plugin",
+    "keywords": [
+        "testing",
+        "members",
+        "activity",
+        "friends",
+        "groups",
+        "messaging",
+        "profiles"
+    ],
+    "homepage": "https://github.com/slaFFik/BP-Default-Data",
+    "license": "GPL-2.0+",
+    "authors": [
+        {
+            "name": "Slava Abakumov",
+            "homepage": "https://ovirium.com"
+        }
+    ],
+    "support": [
+        {
+            "issues": "https://github.com/slaFFik/BP-Default-Data/issues"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.0",
+        "composer/installers": "~1.0",
+        "buddypress/buddypress ": "2.*"
+    }
+}
