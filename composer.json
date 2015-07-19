@@ -1,5 +1,5 @@
 {
-    "name": "slaFFik/bp-default-data",
+    "name": "slaffik/bp-default-data",
     "description": "Create lots of users, messages, friends connections, groups, topics, activity items in BuddyPress - useful for testing purpose",
     "type": "wordpress-plugin",
     "keywords": [
