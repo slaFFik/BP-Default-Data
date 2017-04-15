@@ -5,7 +5,8 @@
  * Description: Plugin will create lots of users, groups, topics, activity items, profile data - useful for testing purpose.
  * Author:      slaFFik
  * Version:     1.1.1
- * Author URI:  http://ovirium.com
+ * Author URI:  https://ovirium.com
+ * Text Domain: bp-default-data
  */
 
 // Exit if accessed directly
@@ -14,6 +15,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 define( 'BPDD_VERSION', '1.1.1' );
+
+/**
+ * Make the plugin translatable.
+ */
+function bpdd_load_plugin_textdomain() {
+	load_plugin_textdomain( 'bp-default-data', FALSE, basename( dirname( __FILE__ ) ) . '/languages/' );
+}
+
+add_action( 'plugins_loaded', 'bpdd_load_plugin_textdomain' );
 
 function bpdd_init() {
 	add_action( bp_core_admin_hook(), 'bpdd_admin_page', 99 );
@@ -28,8 +38,8 @@ function bpdd_admin_page() {
 
 	add_submenu_page(
 		is_multisite() ? 'settings.php' : 'tools.php',
-		__( 'BuddyPress Default Data', 'bpdd' ),
-		__( 'BP Default Data', 'bpdd' ),
+		__( 'BuddyPress Default Data', 'bp-default-data' ),
+		__( 'BP Default Data', 'bp-default-data' ),
 		'manage_options',
 		'bpdd-setup',
 		'bpdd_admin_page_content'
@@ -38,9 +48,8 @@ function bpdd_admin_page() {
 
 function bpdd_admin_page_content() { ?>
 	<div class="wrap">
-		<?php screen_icon( 'buddypress' ); ?>
 
-		<style type="text/css" scoped="">
+		<style type="text/css">
 			ul li.users {
 				border-bottom: 1px solid #EEEEEE;
 				margin: 0 0 10px;
@@ -56,12 +65,12 @@ function bpdd_admin_page_content() { ?>
 				margin-left: 25px
 			}
 		</style>
-		<h2><?php _e( 'BuddyPress Default Data', 'bpdd' ); ?> <sup>v<?php echo BPDD_VERSION ?></sup></h2>
+		<h2><?php _e( 'BuddyPress Default Data', 'bp-default-data' ); ?> <sup>v<?php echo BPDD_VERSION ?></sup></h2>
 
 		<?php
 		if ( ! empty( $_POST['bpdd-admin-clear'] ) ) {
 			bpdd_clear_db();
-			echo '<div id="message" class="updated fade"><p>' . __( 'Everything was deleted', 'bpdd' ) . '</p></div>';
+			echo '<div id="message" class="updated fade"><p>' . __( 'Everything was deleted', 'bp-default-data' ) . '</p></div>';
 		}
 
 		if ( isset( $_POST['bpdd-admin-submit'] ) ) {
@@ -83,47 +92,47 @@ function bpdd_admin_page_content() { ?>
 			// Import users
 			if ( isset( $_POST['bpdd']['import-users'] ) ) {
 				$users             = bpdd_import_users();
-				$imported['users'] = sprintf( __( '%s new users', 'bpdd' ), number_format_i18n( count( $users ) ) );
+				$imported['users'] = sprintf( __( '%s new users', 'bp-default-data' ), number_format_i18n( count( $users ) ) );
 
 				if ( isset( $_POST['bpdd']['import-profile'] ) ) {
 					$profile             = bpdd_import_users_profile();
-					$imported['profile'] = sprintf( __( '%s profile entries', 'bpdd' ), number_format_i18n( $profile ) );
+					$imported['profile'] = sprintf( __( '%s profile entries', 'bp-default-data' ), number_format_i18n( $profile ) );
 				}
 
 				if ( isset( $_POST['bpdd']['import-friends'] ) ) {
 					$friends             = bpdd_import_users_friends();
-					$imported['friends'] = sprintf( __( '%s friends connections', 'bpdd' ), number_format_i18n( $friends ) );
+					$imported['friends'] = sprintf( __( '%s friends connections', 'bp-default-data' ), number_format_i18n( $friends ) );
 				}
 
 				if ( isset( $_POST['bpdd']['import-messages'] ) ) {
 					$messages             = bpdd_import_users_messages();
-					$imported['messages'] = sprintf( __( '%s private messages', 'bpdd' ), number_format_i18n( count( $messages ) ) );
+					$imported['messages'] = sprintf( __( '%s private messages', 'bp-default-data' ), number_format_i18n( count( $messages ) ) );
 				}
 
 				if ( isset( $_POST['bpdd']['import-activity'] ) ) {
 					$activity             = bpdd_import_users_activity();
-					$imported['activity'] = sprintf( __( '%s personal activity items', 'bpdd' ), number_format_i18n( $activity ) );
+					$imported['activity'] = sprintf( __( '%s personal activity items', 'bp-default-data' ), number_format_i18n( $activity ) );
 				}
 			}
 
 			// Import groups
 			if ( isset( $_POST['bpdd']['import-groups'] ) ) {
 				$groups             = bpdd_import_groups( $users );
-				$imported['groups'] = sprintf( __( '%s new groups', 'bpdd' ), number_format_i18n( count( $groups ) ) );
+				$imported['groups'] = sprintf( __( '%s new groups', 'bp-default-data' ), number_format_i18n( count( $groups ) ) );
 
 				if ( isset( $_POST['bpdd']['import-g-members'] ) ) {
 					$g_members             = bpdd_import_groups_members( $groups );
-					$imported['g_members'] = sprintf( __( '%s groups members (1 user can be in several groups)', 'bpdd' ), number_format_i18n( count( $g_members ) ) );
+					$imported['g_members'] = sprintf( __( '%s groups members (1 user can be in several groups)', 'bp-default-data' ), number_format_i18n( count( $g_members ) ) );
 				}
 
 				if ( isset( $_POST['bpdd']['import-forums'] ) ) {
 					$forums             = bpdd_import_groups_forums( $groups );
-					$imported['forums'] = sprintf( __( '%s groups forum topics', 'bpdd' ), number_format_i18n( count( $forums ) ) );
+					$imported['forums'] = sprintf( __( '%s groups forum topics', 'bp-default-data' ), number_format_i18n( count( $forums ) ) );
 				}
 
 				if ( isset( $_POST['bpdd']['import-g-activity'] ) ) {
 					$g_activity             = bpdd_import_groups_activity();
-					$imported['g_activity'] = sprintf( __( '%s groups activity items', 'bpdd' ), number_format_i18n( $g_activity ) );
+					$imported['g_activity'] = sprintf( __( '%s groups activity items', 'bp-default-data' ), number_format_i18n( $g_activity ) );
 				}
 			}
 			?>
@@ -131,7 +140,7 @@ function bpdd_admin_page_content() { ?>
 			<div id="message" class="updated fade">
 				<p>
 					<?php
-					_e( 'Data was successfully imported', 'bpdd' );
+					_e( 'Data was successfully imported', 'bp-default-data' );
 					if ( count( $imported ) > 0 ) {
 						echo ':<ul class="results"><li>';
 						echo implode( '</li><li>', $imported );
@@ -147,25 +156,25 @@ function bpdd_admin_page_content() { ?>
 			<script type="text/javascript">
 				jQuery(document).ready(function () {
 					jQuery('input#import-profile, input#import-friends, input#import-activity, input#import-messages').click(function () {
-						if (jQuery(this).attr('checked') == 'checked')
+						if (jQuery(this).attr('checked') === 'checked')
 							jQuery('input#import-users').attr('checked', 'checked');
 					});
 					jQuery('input#import-users').click(function () {
-						if (jQuery(this).attr('checked') != 'checked')
+						if (jQuery(this).attr('checked') !== 'checked')
 							jQuery('input#import-profile, input#import-friends, input#import-activity, input#import-messages').removeAttr('checked');
 					});
 
 					jQuery('input#import-forums, input#import-g-members, input#import-g-activity').click(function () {
-						if (jQuery(this).attr('checked') == 'checked')
+						if (jQuery(this).attr('checked') === 'checked')
 							jQuery('input#import-groups').attr('checked', 'checked');
 					});
 					jQuery('input#import-groups').click(function () {
-						if (jQuery(this).attr('checked') != 'checked')
+						if (jQuery(this).attr('checked') !== 'checked')
 							jQuery('input#import-forums, input#import-g-members, input#import-g-activity').removeAttr('checked');
 					});
 
 					jQuery("input#bpdd-admin-clear").click(function () {
-						if (confirm('<?php echo esc_js( __( 'Are you sure you want to delete all users (except one with ID=1), groups, messages, activities, forum topics etc?', 'bpdd' ) ); ?>'))
+						if (confirm('<?php echo esc_js( __( 'Are you sure you want to delete all users (except one with ID=1), groups, messages, activities, forum topics etc?', 'bp-default-data' ) ); ?>'))
 							return true;
 						else
 							return false;
@@ -173,15 +182,15 @@ function bpdd_admin_page_content() { ?>
 				});
 			</script>
 
-			<p><?php _e( 'Please do not import users twice as this will cause lots of errors (believe me). Just do clearing.', 'bpdd' ); ?></p>
+			<p><?php _e( 'Please do not import users twice as this will cause lots of errors (believe me). Just do clearing.', 'bp-default-data' ); ?></p>
 
-			<p><?php _e( 'Please do not mess importing users and their data with groups. Importing is rather heavy process, so please finish with members first and then work with groups.', 'bpdd' ); ?></p>
+			<p><?php _e( 'Please do not mess importing users and their data with groups. Importing is rather heavy process, so please finish with members first and then work with groups.', 'bp-default-data' ); ?></p>
 
 			<ul class="items">
 				<li class="users">
 					<label for="import-users">
 						<input type="checkbox" name="bpdd[import-users]" id="import-users" value="1"/>
-						&nbsp; <?php _e( 'Do you want to import users?', 'bpdd' ); ?>
+						&nbsp; <?php _e( 'Do you want to import users?', 'bp-default-data' ); ?>
 					</label>
 					<ul>
 
@@ -189,7 +198,7 @@ function bpdd_admin_page_content() { ?>
 							<li>
 								<label for="import-profile">
 									<input type="checkbox" name="bpdd[import-profile]" id="import-profile" value="1"/>
-									&nbsp; <?php _e( 'Do you want to import users profile data (profile groups and fields will be created)?', 'bpdd' ); ?>
+									&nbsp; <?php _e( 'Do you want to import users profile data (profile groups and fields will be created)?', 'bp-default-data' ); ?>
 								</label>
 							</li>
 						<?php endif; ?>
@@ -198,7 +207,7 @@ function bpdd_admin_page_content() { ?>
 							<li>
 								<label for="import-friends">
 									<input type="checkbox" name="bpdd[import-friends]" id="import-friends" value="1"/>
-									&nbsp; <?php _e( 'Do you want to create some friends connections between imported users?', 'bpdd' ); ?>
+									&nbsp; <?php _e( 'Do you want to create some friends connections between imported users?', 'bp-default-data' ); ?>
 								</label>
 							</li>
 						<?php endif; ?>
@@ -207,7 +216,7 @@ function bpdd_admin_page_content() { ?>
 							<li>
 								<label for="import-activity">
 									<input type="checkbox" name="bpdd[import-activity]" id="import-activity" value="1"/>
-									&nbsp; <?php _e( 'Do you want to import activity posts for users?', 'bpdd' ); ?>
+									&nbsp; <?php _e( 'Do you want to import activity posts for users?', 'bp-default-data' ); ?>
 								</label>
 							</li>
 						<?php endif; ?>
@@ -216,7 +225,7 @@ function bpdd_admin_page_content() { ?>
 							<li>
 								<label for="import-messages">
 									<input type="checkbox" name="bpdd[import-messages]" id="import-messages" value="1"/>
-									&nbsp; <?php _e( 'Do you want to import private messages between users?', 'bpdd' ); ?>
+									&nbsp; <?php _e( 'Do you want to import private messages between users?', 'bp-default-data' ); ?>
 								</label>
 							</li>
 						<?php endif; ?>
@@ -228,13 +237,13 @@ function bpdd_admin_page_content() { ?>
 					<li class="groups">
 						<label for="import-groups"><input type="checkbox" name="bpdd[import-groups]" id="import-groups"
 						                                  value="1"/>
-							&nbsp; <?php _e( 'Do you want to import groups?', 'bpdd' ); ?></label>
+							&nbsp; <?php _e( 'Do you want to import groups?', 'bp-default-data' ); ?></label>
 						<ul>
 
 							<li>
 								<label for="import-g-members"><input type="checkbox" name="bpdd[import-g-members]"
 								                                     id="import-g-members" value="1"/>
-									&nbsp; <?php _e( 'Do you want to import group members? Import users before doing this.', 'bpdd' ); ?>
+									&nbsp; <?php _e( 'Do you want to import group members? Import users before doing this.', 'bp-default-data' ); ?>
 								</label>
 							</li>
 
@@ -242,7 +251,7 @@ function bpdd_admin_page_content() { ?>
 								<li>
 									<label for="import-g-activity"><input type="checkbox" name="bpdd[import-g-activity]"
 									                                      id="import-g-activity" value="1"/>
-										&nbsp; <?php _e( 'Do you want to import group activity posts?', 'bpdd' ); ?>
+										&nbsp; <?php _e( 'Do you want to import group activity posts?', 'bp-default-data' ); ?>
 									</label>
 								</li>
 							<?php endif; ?>
@@ -252,13 +261,13 @@ function bpdd_admin_page_content() { ?>
 									<label for="import-forums"><input type="checkbox" disabled
 									                                  name="bpdd[import-forums]" id="import-forums"
 									                                  value="1"/>
-										&nbsp; <?php _e( 'Do you want to import groups\' forum topics and posts?', 'bpdd' ); ?>
+										&nbsp; <?php _e( 'Do you want to import groups\' forum topics and posts?', 'bp-default-data' ); ?>
 									</label>
 								</li>
 
 							<?php else: ?>
 								<li>
-									<?php _e( 'You can\'t import anything forums-related, because Forum Component is not installed correctly. Please recheck your settings.', 'bpdd' ); ?>
+									<?php _e( 'You can\'t import anything forums-related, because Forum Component is not installed correctly. Please recheck your settings.', 'bp-default-data' ); ?>
 								</li>
 							<?php endif; ?>
 
@@ -271,21 +280,21 @@ function bpdd_admin_page_content() { ?>
 
 			<p class="submit">
 				<input class="button-primary" type="submit" name="bpdd-admin-submit" id="bpdd-admin-submit"
-				       value="<?php esc_attr_e( 'Import Selected Data', 'bpdd' ); ?>"/>
+				       value="<?php esc_attr_e( 'Import Selected Data', 'bp-default-data' ); ?>"/>
 				<input class="button" type="submit" name="bpdd-admin-clear" id="bpdd-admin-clear"
-				       value="<?php esc_attr_e( 'Clear BuddyPress Data', 'bpdd' ); ?>"/>
+				       value="<?php esc_attr_e( 'Clear BuddyPress Data', 'bp-default-data' ); ?>"/>
 			</p>
 
 			<fieldset style="border: 1px solid #ccc;padding: 0 10px;">
-				<legend style="font-weight: bold;"><?php _e( 'Important Information', 'bpdd' ); ?></legend>
-				<p><?php _e( 'All users have the same password: <code>1234567890</code>', 'bpdd' ); ?></p>
+				<legend style="font-weight: bold;"><?php _e( 'Important Information', 'bp-default-data' ); ?></legend>
+				<p><?php _e( 'All users have the same password: <code>1234567890</code>', 'bp-default-data' ); ?></p>
 
-				<p><?php _e( 'Friends connections don\'t produce notifications, while messages importing do.', 'bpdd' ); ?></p>
+				<p><?php _e( 'Friends connections don\'t produce notifications, while messages importing do.', 'bp-default-data' ); ?></p>
 
-				<p><?php _e( 'xProfile data importing doesn\'t produce activity feed records.', 'bpdd' ); ?></p>
+				<p><?php _e( 'xProfile data importing doesn\'t produce activity feed records.', 'bp-default-data' ); ?></p>
 			</fieldset>
 
-			<p class="description"><?php _e( 'Many thanks to <a href="http://imdb.com" target="_blank">IMDB.com</a> for movies titles (groups names), <a href="http://en.wikipedia.org" target="_blank">Wikipedia.org</a> (users names), <a href="http://en.wikipedia.org/wiki/Lorem_ipsum" target="_blank">Lorem Ipsum</a> (messages and forum posts), <a href="http://www.cs.virginia.edu/~robins/quotes.html">Dr. Gabriel Robins</a> and <a href="http://en.proverbia.net/shortfamousquotes.asp">Proverbia</a> (for the lists of quotes), <a href="http://www.youtube.com/">YouTube</a> and <a href="http://vimeo.com/">Vimeo</a> (for videos).', 'bpdd' ); ?></p>
+			<p class="description"><?php _e( 'Many thanks to <a href="http://imdb.com" target="_blank">IMDB.com</a> for movies titles (groups names), <a href="http://en.wikipedia.org" target="_blank">Wikipedia.org</a> (users names), <a href="http://en.wikipedia.org/wiki/Lorem_ipsum" target="_blank">Lorem Ipsum</a> (messages and forum posts), <a href="http://www.cs.virginia.edu/~robins/quotes.html">Dr. Gabriel Robins</a> and <a href="http://en.proverbia.net/shortfamousquotes.asp">Proverbia</a> (for the lists of quotes), <a href="http://www.youtube.com/">YouTube</a> and <a href="http://vimeo.com/">Vimeo</a> (for videos).', 'bp-default-data' ); ?></p>
 
 			<?php wp_nonce_field( 'bpdd-admin' ); ?>
 
@@ -424,8 +433,8 @@ function bpdd_import_users_profile() {
 function bpdd_import_users_messages() {
 	$messages = array();
 
-	/** @var $messages_subjects Array */
-	/** @var $messages_content Array */
+	/** @var $messages_subjects array */
+	/** @var $messages_content array */
 	require( dirname( __FILE__ ) . '/data/messages.php' );
 
 
@@ -554,7 +563,7 @@ function bpdd_import_groups_activity() {
 	$users  = bpdd_get_random_users_ids( 0 );
 	$groups = bpdd_get_random_groups_ids( 0 );
 
-	/** @var $activity Array */
+	/** @var $activity array */
 	require( dirname( __FILE__ ) . '/data/activity.php' );
 
 	for ( $i = 0, $count = 0; $i < 150; $i ++ ) {
@@ -633,7 +642,7 @@ function bpdd_import_groups_members( $groups = false ) {
 	return $members;
 }
 
-function bpdd_import_groups_forums() {
+function bpdd_import_groups_forums( $groups ) {
 	return true;
 }
 
