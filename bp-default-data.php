@@ -20,7 +20,7 @@ define( 'BPDD_VERSION', '1.1.1' );
  * Make the plugin translatable.
  */
 function bpdd_load_plugin_textdomain() {
-	load_plugin_textdomain( 'bp-default-data', FALSE, basename( dirname( __FILE__ ) ) . '/languages/' );
+	load_plugin_textdomain( 'bp-default-data', false, basename( dirname( __FILE__ ) ) . '/languages/' );
 }
 
 add_action( 'plugins_loaded', 'bpdd_load_plugin_textdomain' );
@@ -149,37 +149,38 @@ function bpdd_admin_page_content() { ?>
 				</p>
 			</div>
 
-		<?php
+			<?php
 		} ?>
 
 		<form action="" method="post" id="bpdd-admin-form">
 			<script type="text/javascript">
-				jQuery(document).ready(function () {
-					jQuery('input#import-profile, input#import-friends, input#import-activity, input#import-messages').click(function () {
-						if (jQuery(this).attr('checked') === 'checked')
-							jQuery('input#import-users').attr('checked', 'checked');
-					});
-					jQuery('input#import-users').click(function () {
-						if (jQuery(this).attr('checked') !== 'checked')
-							jQuery('input#import-profile, input#import-friends, input#import-activity, input#import-messages').removeAttr('checked');
-					});
+                jQuery(document).ready(function () {
+                    jQuery('#import-profile, #import-friends, #import-activity, #import-messages').click(function () {
+                        if (jQuery(this).attr('checked') === 'checked')
+                            jQuery('#import-users').attr('checked', 'checked');
+                    });
+                    jQuery('#import-users').click(function () {
+                        if (jQuery(this).attr('checked') !== 'checked')
+                            jQuery('#import-profile, #import-friends, #import-activity, #import-messages').removeAttr('checked');
+                    });
 
-					jQuery('input#import-forums, input#import-g-members, input#import-g-activity').click(function () {
-						if (jQuery(this).attr('checked') === 'checked')
-							jQuery('input#import-groups').attr('checked', 'checked');
-					});
-					jQuery('input#import-groups').click(function () {
-						if (jQuery(this).attr('checked') !== 'checked')
-							jQuery('input#import-forums, input#import-g-members, input#import-g-activity').removeAttr('checked');
-					});
+                    jQuery('#import-forums, #import-g-members, #import-g-activity').click(function () {
+                        if (jQuery(this).attr('checked') === 'checked')
+                            jQuery('#import-groups').attr('checked', 'checked');
+                    });
+                    jQuery('#import-groups').click(function () {
+                        if (jQuery(this).attr('checked') !== 'checked')
+                            jQuery('#import-forums, #import-g-members, #import-g-activity').removeAttr('checked');
+                    });
 
-					jQuery("input#bpdd-admin-clear").click(function () {
-						if (confirm('<?php echo esc_js( __( 'Are you sure you want to delete all users (except one with ID=1), groups, messages, activities, forum topics etc?', 'bp-default-data' ) ); ?>'))
-							return true;
-						else
-							return false;
-					});
-				});
+                    jQuery("#bpdd-admin-clear").click(function () {
+                        if (confirm('<?php echo esc_js( __( 'Are you sure you want to delete all users (except one with ID=1), groups, messages, activities, forum topics etc?', 'bp-default-data' ) ); ?>')) {
+                            return true;
+                        }
+
+                        return false;
+                    });
+                });
 			</script>
 
 			<p><?php _e( 'Please do not import users twice as this will cause lots of errors (believe me). Just do clearing.', 'bp-default-data' ); ?></p>
@@ -235,22 +236,22 @@ function bpdd_admin_page_content() { ?>
 
 				<?php if ( bp_is_active( 'groups' ) ) : ?>
 					<li class="groups">
-						<label for="import-groups"><input type="checkbox" name="bpdd[import-groups]" id="import-groups"
-						                                  value="1"/>
+						<label for="import-groups">
+							<input type="checkbox" name="bpdd[import-groups]" id="import-groups" value="1"/>
 							&nbsp; <?php _e( 'Do you want to import groups?', 'bp-default-data' ); ?></label>
 						<ul>
 
 							<li>
-								<label for="import-g-members"><input type="checkbox" name="bpdd[import-g-members]"
-								                                     id="import-g-members" value="1"/>
+								<label for="import-g-members">
+									<input type="checkbox" name="bpdd[import-g-members]" id="import-g-members" value="1"/>
 									&nbsp; <?php _e( 'Do you want to import group members? Import users before doing this.', 'bp-default-data' ); ?>
 								</label>
 							</li>
 
 							<?php if ( bp_is_active( 'activity' ) ) : ?>
 								<li>
-									<label for="import-g-activity"><input type="checkbox" name="bpdd[import-g-activity]"
-									                                      id="import-g-activity" value="1"/>
+									<label for="import-g-activity">
+										<input type="checkbox" name="bpdd[import-g-activity]" id="import-g-activity" value="1"/>
 										&nbsp; <?php _e( 'Do you want to import group activity posts?', 'bp-default-data' ); ?>
 									</label>
 								</li>
@@ -258,9 +259,8 @@ function bpdd_admin_page_content() { ?>
 
 							<?php if ( bp_is_active( 'forums' ) && bp_forums_is_installed_correctly() ) : ?>
 								<li>
-									<label for="import-forums"><input type="checkbox" disabled
-									                                  name="bpdd[import-forums]" id="import-forums"
-									                                  value="1"/>
+									<label for="import-forums">
+										<input type="checkbox" disabled name="bpdd[import-forums]" id="import-forums" value="1"/>
 										&nbsp; <?php _e( 'Do you want to import groups\' forum topics and posts?', 'bp-default-data' ); ?>
 									</label>
 								</li>
@@ -285,7 +285,7 @@ function bpdd_admin_page_content() { ?>
 				       value="<?php esc_attr_e( 'Clear BuddyPress Data', 'bp-default-data' ); ?>"/>
 			</p>
 
-			<fieldset style="border: 1px solid #ccc;padding: 0 10px;">
+			<fieldset style="border: 2px solid #ccc;padding: 0 10px;margin-bottom: 10px">
 				<legend style="font-weight: bold;"><?php _e( 'Important Information', 'bp-default-data' ); ?></legend>
 				<p><?php _e( 'All users have the same password: <code>1234567890</code>', 'bp-default-data' ); ?></p>
 
@@ -301,7 +301,7 @@ function bpdd_admin_page_content() { ?>
 		</form>
 		<!-- #bpdd-admin-form -->
 	</div><!-- .wrap -->
-<?php
+	<?php
 }
 
 /**
@@ -343,9 +343,7 @@ function bpdd_import_users() {
 }
 
 function bpdd_import_users_profile() {
-	/** @var $wpdb WPDB */
-	global $bp, $wpdb;
-	$data  = array();
+	$data = array();
 
 	$xprofile_structure = require_once( dirname( __FILE__ ) . '/data/xprofile_structure.php' );
 
@@ -398,7 +396,7 @@ function bpdd_import_users_profile() {
 	}
 
 	$xprofile_data = require_once( dirname( __FILE__ ) . '/data/xprofile_data.php' );
-	$users = bpdd_get_random_users_ids( 0 );
+	$users         = bpdd_get_random_users_ids( 0 );
 
 	// now import profile fields data for all fields for each user
 	$count = 0;
@@ -483,7 +481,7 @@ function bpdd_import_users_messages() {
 function bpdd_import_users_activity() {
 	$users = bpdd_get_random_users_ids( 0 );
 
-	/** @var $activity Array */
+	/** @var $activity array */
 	require( dirname( __FILE__ ) . '/data/activity.php' );
 
 	for ( $i = 0, $count = 0; $i < 75; $i ++ ) {
@@ -642,15 +640,22 @@ function bpdd_import_groups_members( $groups = false ) {
 	return $members;
 }
 
-function bpdd_import_groups_forums( $groups ) {
+/**
+ * Give ability to import forums and topics for groups.
+ * Not used currently.
+ *
+ * @param array $groups
+ *
+ * @return bool
+ */
+function bpdd_import_groups_forums( /** @noinspection PhpUnusedParameterInspection */ $groups ) {
 	return true;
 }
 
 /*
-*  Helpers
-*/
+ *  Helpers
+ */
 function bpdd_clear_db() {
-	/** @var $wpdb WPDB */
 	global $wpdb;
 
 	$prefix = bp_core_get_table_prefix();
@@ -699,8 +704,15 @@ function bpdd_clear_db() {
 	}
 }
 
+/**
+ * Get the array (or a string) of group IDs.
+ *
+ * @param int $count If you need all, use 0.
+ * @param string $output
+ *
+ * @return array|bool|string
+ */
 function bpdd_get_random_groups_ids( $count = 1, $output = 'array' ) {
-	/** @var $wpdb WPDB */
 	global $wpdb;
 	$data  = array();
 	$limit = '';
@@ -725,8 +737,15 @@ function bpdd_get_random_groups_ids( $count = 1, $output = 'array' ) {
 	return false;
 }
 
+/**
+ * Get the array (or a string) of user IDs.
+ *
+ * @param int $count If you need all, use 0.
+ * @param string $output
+ *
+ * @return array|bool|string
+ */
 function bpdd_get_random_users_ids( $count = 1, $output = 'array' ) {
-	/** @var $wpdb WPDB */
 	global $wpdb;
 	$limit = '';
 	$data  = array();
@@ -742,9 +761,9 @@ function bpdd_get_random_users_ids( $count = 1, $output = 'array' ) {
 		$data[] = $user->ID;
 	}
 
-	if ( $output == 'array' ) {
+	if ( $output === 'array' ) {
 		return $data;
-	} elseif ( $output == 'string' ) {
+	} elseif ( $output === 'string' ) {
 		return implode( ',', $data );
 	}
 
@@ -753,16 +772,16 @@ function bpdd_get_random_users_ids( $count = 1, $output = 'array' ) {
 
 function bpdd_get_random_date( $days_from = 30, $days_to = 0 ) {
 	// 1 day in seconds is 86400
-	$from = $days_from * rand( 10000, 99999 );
+	$from = $days_from * mt_rand( 10000, 99999 );
 
 	// $days_from should always be less than $days_to
 	if ( $days_to > $days_from ) {
 		$days_to = $days_from - 1;
 	}
 
-	$to        = $days_to * rand( 10000, 99999 );
+	$to        = $days_to * mt_rand( 10000, 99999 );
 	$date_from = time() - $from;
 	$date_to   = time() - $to;
 
-	return date( 'Y-m-d H:i:s', rand( $date_from, $date_to ) );
+	return date( 'Y-m-d H:i:s', mt_rand( $date_from, $date_to ) );
 }
