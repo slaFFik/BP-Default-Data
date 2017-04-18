@@ -510,12 +510,9 @@ function bpdd_import_users_friends() {
 		$user_one = $users[ array_rand( $users ) ];
 		$user_two = $users[ array_rand( $users ) ];
 
-		if ( BP_Friends_Friendship::check_is_friend( $user_one, $user_two ) == 'not_friends' ) {
-
-			// make them friends
-			if ( friends_add_friend( $user_one, $user_two, true ) ) {
-				$con ++;
-			}
+		// Make them friends if possible.
+		if ( friends_add_friend( $user_one, $user_two, true ) ) {
+			$con ++;
 		}
 	}
 
@@ -752,23 +749,19 @@ function bpdd_get_random_groups_ids( $count = 1, $output = 'array' ) {
 function bpdd_get_random_users_ids( $count = 1, $output = 'array' ) {
 	global $wpdb;
 	$limit = '';
-	$data  = array();
 
 	if ( $count > 0 ) {
 		$limit = ' LIMIT ' . $count;
 	}
 
-	$users = $wpdb->get_results( "SELECT ID FROM {$wpdb->users} ORDER BY rand() {$limit}" );
+	$users = $wpdb->get_col( "SELECT ID FROM {$wpdb->users} ORDER BY rand() {$limit}" );
 
-	// reformat the array
-	foreach ( $users as $user ) {
-		$data[] = $user->ID;
-	}
+	$users = array_map( 'intval', $users );
 
 	if ( $output === 'array' ) {
-		return $data;
+		return $users;
 	} elseif ( $output === 'string' ) {
-		return implode( ',', $data );
+		return implode( ',', $users );
 	}
 
 	return false;
