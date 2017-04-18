@@ -708,31 +708,28 @@ function bpdd_clear_db() {
  * @param int $count If you need all, use 0.
  * @param string $output
  *
- * @return array|bool|string
+ * @return array|string Default is array.
  */
 function bpdd_get_random_groups_ids( $count = 1, $output = 'array' ) {
 	global $wpdb;
-	$data  = array();
 	$limit = '';
 
 	if ( $count > 0 ) {
 		$limit = ' LIMIT ' . $count;
 	}
 
-	$groups = $wpdb->get_results( "SELECT id FROM {$wpdb->prefix}bp_groups ORDER BY rand() {$limit}" );
+	$groups = $wpdb->get_col( "SELECT id FROM {$wpdb->prefix}bp_groups ORDER BY rand() {$limit}" );
 
-	// reformat the array
-	foreach ( $groups as $group ) {
-		$data[] = $group->id;
+	/*
+	 * Convert to integers, because get_col() returns array of strings.
+	 */
+	$groups = array_map( 'intval', $groups );
+
+	if ( $output === 'string' ) {
+		return implode( ',', $groups );
 	}
 
-	if ( $output == 'array' ) {
-		return $data;
-	} elseif ( $output == 'string' ) {
-		return implode( ',', $data );
-	}
-
-	return false;
+	return $groups;
 }
 
 /**
@@ -741,7 +738,7 @@ function bpdd_get_random_groups_ids( $count = 1, $output = 'array' ) {
  * @param int $count If you need all, use 0.
  * @param string $output
  *
- * @return array|bool|string
+ * @return array|string Default is array.
  */
 function bpdd_get_random_users_ids( $count = 1, $output = 'array' ) {
 	global $wpdb;
@@ -753,17 +750,27 @@ function bpdd_get_random_users_ids( $count = 1, $output = 'array' ) {
 
 	$users = $wpdb->get_col( "SELECT ID FROM {$wpdb->users} ORDER BY rand() {$limit}" );
 
+	/*
+	 * Convert to integers, because get_col() returns array of strings.
+	 */
 	$users = array_map( 'intval', $users );
 
-	if ( $output === 'array' ) {
-		return $users;
-	} elseif ( $output === 'string' ) {
+	if ( $output === 'string' ) {
 		return implode( ',', $users );
 	}
 
-	return false;
+	return $users;
 }
 
+/**
+ * Get a random date between some days in history.
+ * If [30;5] is specified - that means a random date between 30 and 5 days from now.
+ *
+ * @param int $days_from
+ * @param int $days_to
+ *
+ * @return string
+ */
 function bpdd_get_random_date( $days_from = 30, $days_to = 0 ) {
 	// 1 day in seconds is 86400
 	$from = $days_from * mt_rand( 10000, 99999 );
