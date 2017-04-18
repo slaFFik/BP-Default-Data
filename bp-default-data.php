@@ -77,14 +77,6 @@ function bpdd_admin_page_content() { ?>
 			// default values
 			$users      = false;
 			$imported   = array();
-			$profile    = false;
-			$messages   = false;
-			$activity   = false;
-			$friends    = false;
-			$groups     = false;
-			$forums     = false;
-			$g_activity = false;
-			$g_members  = false;
 
 			// Check nonce before we do anything
 			check_admin_referer( 'bpdd-admin' );
@@ -125,10 +117,10 @@ function bpdd_admin_page_content() { ?>
 					$imported['g_members'] = sprintf( __( '%s groups members (1 user can be in several groups)', 'bp-default-data' ), number_format_i18n( count( $g_members ) ) );
 				}
 
-				if ( isset( $_POST['bpdd']['import-forums'] ) ) {
-					$forums             = bpdd_import_groups_forums( $groups );
-					$imported['forums'] = sprintf( __( '%s groups forum topics', 'bp-default-data' ), number_format_i18n( count( $forums ) ) );
-				}
+				//if ( isset( $_POST['bpdd']['import-forums'] ) ) {
+				//	$forums             = bpdd_import_groups_forums( $groups );
+				//	$imported['forums'] = sprintf( __( '%s groups forum topics', 'bp-default-data' ), number_format_i18n( count( $forums ) ) );
+				//}
 
 				if ( isset( $_POST['bpdd']['import-g-activity'] ) ) {
 					$g_activity             = bpdd_import_groups_activity();
@@ -501,6 +493,11 @@ function bpdd_import_users_activity() {
 	return $count;
 }
 
+/**
+ * Get random users from the DB and generate friends connections.
+ *
+ * @return int
+ */
 function bpdd_import_users_friends() {
 	$users = bpdd_get_random_users_ids( 50 );
 
