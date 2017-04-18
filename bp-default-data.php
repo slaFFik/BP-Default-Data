@@ -335,6 +335,8 @@ function bpdd_import_users() {
 		}
 
 		bp_update_user_meta( $user_id, 'notification_messages_new_message', 'no' );
+		bp_update_user_meta( $user_id, 'notification_friends_friendship_request', 'no' );
+		bp_update_user_meta( $user_id, 'notification_friends_friendship_accepted', 'no' );
 
 		$users[] = $user_id;
 	}
@@ -502,7 +504,9 @@ function bpdd_import_users_activity() {
 function bpdd_import_users_friends() {
 	$users = bpdd_get_random_users_ids( 50 );
 
-	for ( $con = 0, $i = 0; $i < 100; $i ++ ) {
+	$con = 0;
+
+	for ( $i = 0; $i < 100; $i ++ ) {
 		$user_one = $users[ array_rand( $users ) ];
 		$user_two = $users[ array_rand( $users ) ];
 
@@ -518,9 +522,9 @@ function bpdd_import_users_friends() {
 	return $con;
 }
 
-/*
-*  Importer engine - GROUPS
-*/
+/**
+ *  Importer engine - GROUPS
+ */
 function bpdd_import_groups( $users = false ) {
 	$groups    = array();
 	$group_ids = array();
@@ -652,7 +656,7 @@ function bpdd_import_groups_forums( /** @noinspection PhpUnusedParameterInspecti
 	return true;
 }
 
-/*
+/**
  *  Helpers
  */
 function bpdd_clear_db() {
