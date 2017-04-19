@@ -25,12 +25,18 @@ function bpdd_load_plugin_textdomain() {
 
 add_action( 'plugins_loaded', 'bpdd_load_plugin_textdomain' );
 
+/**
+ * Load the plugin admin area registration hook.
+ */
 function bpdd_init() {
 	add_action( bp_core_admin_hook(), 'bpdd_admin_page', 99 );
 }
 
 add_action( 'bp_init', 'bpdd_init' );
 
+/**
+ * Register admin area page link and its handler.
+ */
 function bpdd_admin_page() {
 	if ( ! is_super_admin() ) {
 		return;
@@ -46,6 +52,9 @@ function bpdd_admin_page() {
 	);
 }
 
+/**
+ * Display the admin area page.
+ */
 function bpdd_admin_page_content() { ?>
 	<div class="wrap">
 
@@ -336,6 +345,11 @@ function bpdd_import_users() {
 	return $users;
 }
 
+/**
+ * Import extended profile fields.
+ *
+ * @return int
+ */
 function bpdd_import_users_profile() {
 	$data = array();
 
@@ -422,6 +436,11 @@ function bpdd_import_users_profile() {
 	return $count;
 }
 
+/**
+ * Import private messages between users.
+ *
+ * @return array
+ */
 function bpdd_import_users_messages() {
 	$messages = array();
 
@@ -472,6 +491,11 @@ function bpdd_import_users_messages() {
 	return $messages;
 }
 
+/**
+ * Import Activity - aka "status updates".
+ *
+ * @return int Number of activity records that were inserted into the database.
+ */
 function bpdd_import_users_activity() {
 	$users = bpdd_get_random_users_ids( 0 );
 
@@ -482,11 +506,15 @@ function bpdd_import_users_activity() {
 		$user    = $users[ array_rand( $users ) ];
 		$content = $activity[ array_rand( $activity ) ];
 
-		if ( bp_activity_post_update( array(
+		if ( $bp_activity_id = bp_activity_post_update( array(
 			                              'user_id' => $user,
 			                              'content' => $content,
 		                              ) ) ) {
-			$count ++;
+			$bp_activity = new BP_Activity_Activity( $bp_activity_id );
+			$bp_activity->date_recorded = bpdd_get_random_date( 44 );
+			if ( $bp_activity->save() ) {
+				$count ++;
+			}
 		}
 	}
 
@@ -555,6 +583,11 @@ function bpdd_import_groups( $users = false ) {
 	return $group_ids;
 }
 
+/**
+ * Import groups activity - aka "status updates".
+ *
+ * @return int
+ */
 function bpdd_import_groups_activity() {
 	$users  = bpdd_get_random_users_ids( 0 );
 	$groups = bpdd_get_random_groups_ids( 0 );
@@ -571,18 +604,29 @@ function bpdd_import_groups_activity() {
 			continue;
 		}
 
-		if ( groups_post_update( array(
+		if ( $bp_activity_id = groups_post_update( array(
 			                         'user_id'  => $user_id,
 			                         'group_id' => $group_id,
 			                         'content'  => $content,
 		                         ) ) ) {
-			$count ++;
+			$bp_activity = new BP_Activity_Activity( $bp_activity_id );
+			$bp_activity->date_recorded = bpdd_get_random_date( 29 );
+			if ( $bp_activity->save() ) {
+				$count ++;
+			}
 		}
 	}
 
 	return $count;
 }
 
+/**
+ * Import groups members.
+ *
+ * @param bool $groups We can import random groups or work with a predefined list.
+ *
+ * @return array
+ */
 function bpdd_import_groups_members( $groups = false ) {
 	$members = array();
 
@@ -650,8 +694,12 @@ function bpdd_import_groups_forums( /** @noinspection PhpUnusedParameterInspecti
 	return true;
 }
 
+/*******************************
+ *********** Helpers ***********
+ *******************************/
+
 /**
- *  Helpers
+ * Delete all imported information (will be hugely rewritten).
  */
 function bpdd_clear_db() {
 	global $wpdb;
@@ -772,17 +820,13 @@ function bpdd_get_random_users_ids( $count = 1, $output = 'array' ) {
  * @return string
  */
 function bpdd_get_random_date( $days_from = 30, $days_to = 0 ) {
-	// 1 day in seconds is 86400
-	$from = $days_from * mt_rand( 10000, 99999 );
-
 	// $days_from should always be less than $days_to
 	if ( $days_to > $days_from ) {
 		$days_to = $days_from - 1;
 	}
 
-	$to        = $days_to * mt_rand( 10000, 99999 );
-	$date_from = time() - $from;
-	$date_to   = time() - $to;
+	$date_from = new DateTime('now - '. $days_from .' days');
+	$date_to   = new DateTime('now - '. $days_to .' days');
 
-	return date( 'Y-m-d H:i:s', mt_rand( $date_from, $date_to ) );
+	return date( 'Y-m-d H:i:s', mt_rand( $date_from->getTimestamp(), $date_to->getTimestamp() ) );
 }
