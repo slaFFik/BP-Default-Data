@@ -56,8 +56,7 @@ function bpdd_admin_page() {
  * Display the admin area page.
  */
 function bpdd_admin_page_content() { ?>
-	<div class="wrap">
-
+	<div class="wrap" id="bp-default-data-page">
 		<style type="text/css">
 			ul li.users {
 				border-bottom: 1px solid #EEEEEE;
@@ -84,8 +83,8 @@ function bpdd_admin_page_content() { ?>
 
 		if ( isset( $_POST['bpdd-admin-submit'] ) ) {
 			// default values
-			$users      = false;
-			$imported   = array();
+			$users    = false;
+			$imported = array();
 
 			// Check nonce before we do anything
 			check_admin_referer( 'bpdd-admin' );
@@ -507,10 +506,11 @@ function bpdd_import_users_activity() {
 		$content = $activity[ array_rand( $activity ) ];
 
 		if ( $bp_activity_id = bp_activity_post_update( array(
-			                              'user_id' => $user,
-			                              'content' => $content,
-		                              ) ) ) {
-			$bp_activity = new BP_Activity_Activity( $bp_activity_id );
+			                                                'user_id' => $user,
+			                                                'content' => $content,
+		                                                ) )
+		) {
+			$bp_activity                = new BP_Activity_Activity( $bp_activity_id );
 			$bp_activity->date_recorded = bpdd_get_random_date( 44 );
 			if ( $bp_activity->save() ) {
 				$count ++;
@@ -605,11 +605,12 @@ function bpdd_import_groups_activity() {
 		}
 
 		if ( $bp_activity_id = groups_post_update( array(
-			                         'user_id'  => $user_id,
-			                         'group_id' => $group_id,
-			                         'content'  => $content,
-		                         ) ) ) {
-			$bp_activity = new BP_Activity_Activity( $bp_activity_id );
+			                                           'user_id'  => $user_id,
+			                                           'group_id' => $group_id,
+			                                           'content'  => $content,
+		                                           ) )
+		) {
+			$bp_activity                = new BP_Activity_Activity( $bp_activity_id );
 			$bp_activity->date_recorded = bpdd_get_random_date( 29 );
 			if ( $bp_activity->save() ) {
 				$count ++;
@@ -634,50 +635,20 @@ function bpdd_import_groups_members( $groups = false ) {
 		$groups = bpdd_get_random_groups_ids( 0 );
 	}
 
-	$new_member = new BP_Groups_Member;
+	add_filter( 'bp_after_activity_add_parse_args', 'bpdd_groups_join_group_date_fix' );
+
 	foreach ( $groups as $group_id ) {
 		$user_ids = bpdd_get_random_users_ids( rand( 2, 15 ) );
 
 		foreach ( $user_ids as $user_id ) {
-			if ( groups_is_user_member( $user_id, $group_id ) ) {
-				continue;
-			}
 
-			$time = bpdd_get_random_date( 25, 1 );
-
-			$new_member->id            = false;
-			$new_member->group_id      = $group_id;
-			$new_member->user_id       = $user_id;
-			$new_member->inviter_id    = 0;
-			$new_member->is_admin      = 0;
-			$new_member->user_title    = '';
-			$new_member->date_modified = $time;
-			$new_member->is_confirmed  = 1;
-
-			// save data - finally
-			if ( $new_member->save() ) {
-				$group = new BP_Groups_Group( $group_id );
-
-				// record this in activity streams
-				$activity_id[] = groups_record_activity( array(
-					                                         'action'        => apply_filters( 'groups_activity_joined_group', sprintf( __( '%1$s joined the group %2$s', 'buddypress' ), bp_core_get_userlink( $user_id ), '<a href="' . bp_get_group_permalink( $group ) . '">' . esc_attr( bp_get_group_name( $group ) ) . '</a>' ) ),
-					                                         'type'          => 'joined_group',
-					                                         'item_id'       => $group_id,
-					                                         'user_id'       => $user_id,
-					                                         'recorded_time' => $time
-				                                         ) );
-
-				// modify group meta
-				groups_update_groupmeta( $group_id, 'total_member_count', (int) groups_get_groupmeta( $group_id, 'total_member_count' ) + 1 );
-				groups_update_groupmeta( $group_id, 'last_activity', $time );
-
-				do_action( 'groups_join_group', $group_id, $user_id );
-
-				// I need to know how many users were added to display in report after the import
+			if ( groups_join_group( $group_id, $user_id ) ) {
 				$members[] = $group_id;
 			}
 		}
 	}
+
+	remove_filter( 'bp_after_activity_add_parse_args', 'bpdd_groups_join_group_date_fix' );
 
 	return $members;
 }
@@ -690,7 +661,10 @@ function bpdd_import_groups_members( $groups = false ) {
  *
  * @return bool
  */
-function bpdd_import_groups_forums( /** @noinspection PhpUnusedParameterInspection */ $groups ) {
+function bpdd_import_groups_forums(
+	/** @noinspection PhpUnusedParameterInspection */
+	$groups
+) {
 	return true;
 }
 
@@ -748,6 +722,24 @@ function bpdd_clear_db() {
 	foreach ( $sqls as $sql ) {
 		$wpdb->query( $sql );
 	}
+}
+
+/**
+ * Fix the date issue, when all joined_group events took place at one time.
+ *
+ * @param array $args Arguments that are passed to bp_activity_add().
+ *
+ * @return mixed
+ */
+function bpdd_groups_join_group_date_fix( $args ) {
+	if (
+		$args['type'] === 'joined_group' &&
+		$args['component'] === 'groups'
+	) {
+		$args['recorded_time'] = bpdd_get_random_date( 25, 1 );
+	}
+
+	return $args;
 }
 
 /**
@@ -825,8 +817,8 @@ function bpdd_get_random_date( $days_from = 30, $days_to = 0 ) {
 		$days_to = $days_from - 1;
 	}
 
-	$date_from = new DateTime('now - '. $days_from .' days');
-	$date_to   = new DateTime('now - '. $days_to .' days');
+	$date_from = new DateTime( 'now - ' . $days_from . ' days' );
+	$date_to   = new DateTime( 'now - ' . $days_to . ' days' );
 
 	return date( 'Y-m-d H:i:s', mt_rand( $date_from->getTimestamp(), $date_to->getTimestamp() ) );
 }
