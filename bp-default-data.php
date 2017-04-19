@@ -528,8 +528,9 @@ function bpdd_import_users_activity() {
  */
 function bpdd_import_users_friends() {
 	$users = bpdd_get_random_users_ids( 50 );
+	$con   = 0;
 
-	$con = 0;
+	add_filter( 'bp_core_current_time', 'bpdd_friends_add_friend_date_fix' );
 
 	for ( $i = 0; $i < 100; $i ++ ) {
 		$user_one = $users[ array_rand( $users ) ];
@@ -540,6 +541,8 @@ function bpdd_import_users_friends() {
 			$con ++;
 		}
 	}
+
+	remove_filter( 'bp_core_current_time', 'bpdd_friends_add_friend_date_fix' );
 
 	return $con;
 }
@@ -725,11 +728,11 @@ function bpdd_clear_db() {
 }
 
 /**
- * Fix the date issue, when all joined_group events took place at one time.
+ * Fix the date issue, when all joined_group events took place at the same time.
  *
  * @param array $args Arguments that are passed to bp_activity_add().
  *
- * @return mixed
+ * @return array
  */
 function bpdd_groups_join_group_date_fix( $args ) {
 	if (
@@ -740,6 +743,17 @@ function bpdd_groups_join_group_date_fix( $args ) {
 	}
 
 	return $args;
+}
+
+/**
+ * Fix the date issue, when all friends connections are done at the same time.
+ *
+ * @param string $current_time Default BuddyPress current timestamp.
+ *
+ * @return string
+ */
+function bpdd_friends_add_friend_date_fix( $current_time ) {
+	return bpdd_get_random_date( 43 );
 }
 
 /**
