@@ -17,7 +17,7 @@ Please use this plugin with caution and not on a live site! Again, USE FOR TESTI
 
 Clear BuddyPress button will truncate tables: messages, groups, notifications, friends, forum posts, xprofile. All users except one with ID=1 and all corresponding data (usermeta, activity etc) will be deleted too.
 
-And turn off email notifications in profile (frienship accepted and messages received) - or you will spam yourself :) Imported users have these settings already turned off.
+And turn off email notifications in profile (friendship accepted and messages received) - or you will spam yourself :) Imported users have these settings already turned off.
 
 == Installation ==
 
@@ -33,10 +33,10 @@ And turn off email notifications in profile (frienship accepted and messages rec
 
 = 1.1.2 (19.04.2017) =
 * Better active components check - no more failing if (for example) xProfile is disabled
-* Fixed dates problem - now all dates are randomize in activity stream
+* Fixed dates problem - now all dates are randomized in activity stream
 * Fixed several notices and warnings that were generated under certain circumstances
 * Better translation support
-* Turned off emails for imported users
+* Turned off certain emails for imported users
 * Better code logic in various places, and code comments
 
 = 1.1.1 (19.07.2015) =
