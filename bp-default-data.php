@@ -26,6 +26,29 @@ function bpdd_load_plugin_textdomain() {
 add_action( 'plugins_loaded', 'bpdd_load_plugin_textdomain' );
 
 /**
+ * Get plugin admin area root page: settings.php for WPMS and tool.php for WP.
+ * @return string
+ */
+function bpdd_get_root_admin_page() {
+	return is_multisite() ? 'settings.php' : 'tools.php';
+}
+
+/**
+ * Add the Settings link for the plugin on Plugins page in wp-admin area.
+ *
+ * @param array $links
+ *
+ * @return array
+ */
+function bpdd_plugins_settings_link( $links ) {
+	$links['settings'] = '<a href="' . bp_get_admin_url( bpdd_get_root_admin_page() . '?page=bpdd-setup' ) . '">' . __( 'Settings', 'bp-default-data' ) . '</a>';
+
+	return $links;
+}
+
+add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), 'bpdd_plugins_settings_link' );
+
+/**
  * Load the plugin admin area registration hook.
  */
 function bpdd_init() {
@@ -43,7 +66,7 @@ function bpdd_admin_page() {
 	}
 
 	add_submenu_page(
-		is_multisite() ? 'settings.php' : 'tools.php',
+		bpdd_get_root_admin_page(),
 		__( 'BuddyPress Default Data', 'bp-default-data' ),
 		__( 'BP Default Data', 'bp-default-data' ),
 		'manage_options',
