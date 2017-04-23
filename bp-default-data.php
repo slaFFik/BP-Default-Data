@@ -294,7 +294,9 @@ function bpdd_admin_page_content() { ?>
 				<p><?php _e( 'xProfile data importing doesn\'t produce activity feed records.', 'bp-default-data' ); ?></p>
 			</fieldset>
 
-			<p class="description"><?php _e( 'Many thanks to <a href="http://imdb.com" target="_blank">IMDB.com</a> for movies titles (groups names), <a href="http://en.wikipedia.org" target="_blank">Wikipedia.org</a> (users names), <a href="http://en.wikipedia.org/wiki/Lorem_ipsum" target="_blank">Lorem Ipsum</a> (messages and forum posts), <a href="http://www.cs.virginia.edu/~robins/quotes.html">Dr. Gabriel Robins</a> and <a href="http://en.proverbia.net/shortfamousquotes.asp">Proverbia</a> (for the lists of quotes), <a href="http://www.youtube.com/">YouTube</a> and <a href="http://vimeo.com/">Vimeo</a> (for videos).', 'bp-default-data' ); ?></p>
+			<p class="description">
+				<?php _e( 'Many thanks to <a href="http://imdb.com" target="_blank">IMDB.com</a> for movies titles (groups names), <a href="https://en.wikipedia.org" target="_blank">Wikipedia.org</a> (users names), <a href="https://en.wikipedia.org/wiki/Lorem_ipsum" target="_blank">Lorem Ipsum</a> (messages and forum posts), <a href="http://www.cs.virginia.edu/~robins/quotes.html">Dr. Gabriel Robins</a> and <a href="http://en.proverbia.net/shortfamousquotes.asp">Proverbia</a> (lists of quotes), <a href="https://www.youtube.com/">YouTube</a> and <a href="https://vimeo.com/">Vimeo</a> (videos), <a href="https://8biticon.com/">8biticon.com</a> (avatars and plugin icon).', 'bp-default-data' ); ?>
+			</p>
 
 			<?php wp_nonce_field( 'bpdd-admin' ); ?>
 
