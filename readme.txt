@@ -47,6 +47,9 @@ That's it!
 
 == Changelog ==
 
+= 1.2.0 (..2017) =
+* Improved plugin installation instructions
+
 = 1.1.2 (19.04.2017) =
 * Better active components check - no more failing if (for example) xProfile is disabled
 * Fixed dates problem - now all dates are randomized in activity stream
