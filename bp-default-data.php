@@ -216,13 +216,15 @@ function bpdd_admin_page_content() { ?>
                 });
 			</script>
 
-			<p><?php _e( 'Please do not mess importing users and their data with groups. Importing is rather heavy process, so please finish with members first and then work with groups.', 'bp-default-data' ); ?></p>
+			<p><?php _e( 'Please do not mess importing users and their data with groups on a slow server (or shared hosting). Importing is rather heavy process, so please finish with members first and then work with groups.', 'bp-default-data' ); ?></p>
+
+			<p><?php _e( 'What do you want to import?', 'bp-default-data' ); ?></p>
 
 			<ul class="items">
 				<li class="users">
 					<label for="import-users">
 						<input type="checkbox" name="bpdd[import-users]" id="import-users" value="1" <?php bpdd_imported_disabled( 'users', 'users' ) ?>/>
-						<?php _e( 'Do you want to import users?', 'bp-default-data' ); ?>
+						<?php _e( 'Users', 'bp-default-data' ); ?>
 					</label>
 					<ul>
 
@@ -230,7 +232,7 @@ function bpdd_admin_page_content() { ?>
 							<li>
 								<label for="import-profile">
 									<input type="checkbox" name="bpdd[import-profile]" id="import-profile" value="1" <?php bpdd_imported_disabled( 'users', 'xprofile' ) ?>/>
-									<?php _e( 'Do you want to import users profile data (profile groups and fields will be created)?', 'bp-default-data' ); ?>
+									<?php _e( 'Profile data (profile groups and fields with values)', 'bp-default-data' ); ?>
 								</label>
 							</li>
 						<?php endif; ?>
@@ -239,7 +241,7 @@ function bpdd_admin_page_content() { ?>
 							<li>
 								<label for="import-friends">
 									<input type="checkbox" name="bpdd[import-friends]" id="import-friends" value="1" <?php bpdd_imported_disabled( 'users', 'friends' ) ?>/>
-									<?php _e( 'Do you want to create some friends connections between imported users?', 'bp-default-data' ); ?>
+									<?php _e( 'Friends connections', 'bp-default-data' ); ?>
 								</label>
 							</li>
 						<?php endif; ?>
@@ -248,7 +250,7 @@ function bpdd_admin_page_content() { ?>
 							<li>
 								<label for="import-activity">
 									<input type="checkbox" name="bpdd[import-activity]" id="import-activity" value="1" <?php bpdd_imported_disabled( 'users', 'activity' ) ?>/>
-									<?php _e( 'Do you want to import activity posts for users?', 'bp-default-data' ); ?>
+									<?php _e( 'Activity posts', 'bp-default-data' ); ?>
 								</label>
 							</li>
 						<?php endif; ?>
@@ -257,7 +259,7 @@ function bpdd_admin_page_content() { ?>
 							<li>
 								<label for="import-messages">
 									<input type="checkbox" name="bpdd[import-messages]" id="import-messages" value="1" <?php bpdd_imported_disabled( 'users', 'messages' ) ?>/>
-									<?php _e( 'Do you want to import private messages between users?', 'bp-default-data' ); ?>
+									<?php _e( 'Private messages', 'bp-default-data' ); ?>
 								</label>
 							</li>
 						<?php endif; ?>
@@ -269,13 +271,13 @@ function bpdd_admin_page_content() { ?>
 					<li class="groups">
 						<label for="import-groups">
 							<input type="checkbox" name="bpdd[import-groups]" id="import-groups" value="1" <?php bpdd_imported_disabled( 'groups', 'groups' ) ?>/>
-							<?php _e( 'Do you want to import groups?', 'bp-default-data' ); ?></label>
+							<?php _e( 'Groups', 'bp-default-data' ); ?></label>
 						<ul>
 
 							<li>
 								<label for="import-g-members">
 									<input type="checkbox" name="bpdd[import-g-members]" id="import-g-members" value="1" <?php bpdd_imported_disabled( 'groups', 'members' ) ?>/>
-									<?php _e( 'Do you want to import group members? Import users before doing this.', 'bp-default-data' ); ?>
+									<?php _e( 'Members', 'bp-default-data' ); ?>
 								</label>
 							</li>
 
@@ -283,7 +285,7 @@ function bpdd_admin_page_content() { ?>
 								<li>
 									<label for="import-g-activity">
 										<input type="checkbox" name="bpdd[import-g-activity]" id="import-g-activity" value="1" <?php bpdd_imported_disabled( 'groups', 'activity' ) ?>/>
-										<?php _e( 'Do you want to import group activity posts?', 'bp-default-data' ); ?>
+										<?php _e( 'Activity posts', 'bp-default-data' ); ?>
 									</label>
 								</li>
 							<?php endif; ?>
@@ -292,7 +294,7 @@ function bpdd_admin_page_content() { ?>
 								<li>
 									<label for="import-forums">
 										<input type="checkbox" disabled name="bpdd[import-forums]" id="import-forums" value="1" <?php bpdd_imported_disabled( 'groups', 'forums' ) ?>/>
-										<?php _e( 'Do you want to import groups\' forum topics and posts?', 'bp-default-data' ); ?>
+										<?php _e( 'Forum topics and posts', 'bp-default-data' ); ?>
 									</label>
 								</li>
 
@@ -318,15 +320,12 @@ function bpdd_admin_page_content() { ?>
 
 			<fieldset style="border: 2px solid #ccc;padding: 0 10px;margin-bottom: 10px">
 				<legend style="font-weight: bold;"><?php _e( 'Important Information', 'bp-default-data' ); ?></legend>
-				<p><?php _e( 'All users have the same password: <code>1234567890</code>', 'bp-default-data' ); ?></p>
-
-				<p><?php _e( 'Friends connections don\'t produce notifications, while messages importing do.', 'bp-default-data' ); ?></p>
-
-				<p><?php _e( 'xProfile data importing doesn\'t produce activity feed records.', 'bp-default-data' ); ?></p>
+				<p><?php _e( 'All imported users have the same password: <code>1234567890</code>', 'bp-default-data' ); ?></p>
+				<p><?php _e( 'xProfile data importing doesn\'t produce activity records.', 'bp-default-data' ); ?></p>
 			</fieldset>
 
 			<p class="description">
-				<?php _e( 'Many thanks to <a href="http://imdb.com" target="_blank">IMDB.com</a> for movies titles (groups names), <a href="https://en.wikipedia.org" target="_blank">Wikipedia.org</a> (users names), <a href="https://en.wikipedia.org/wiki/Lorem_ipsum" target="_blank">Lorem Ipsum</a> (messages and forum posts), <a href="http://www.cs.virginia.edu/~robins/quotes.html">Dr. Gabriel Robins</a> and <a href="http://en.proverbia.net/shortfamousquotes.asp">Proverbia</a> (lists of quotes), <a href="https://www.youtube.com/">YouTube</a> and <a href="https://vimeo.com/">Vimeo</a> (videos), <a href="https://8biticon.com/">8biticon.com</a> (avatars and plugin icon).', 'bp-default-data' ); ?>
+				Many thanks to <a href="http://imdb.com" target="_blank">IMDB.com</a> for movies titles (groups names), <a href="https://en.wikipedia.org" target="_blank">Wikipedia.org</a> (users names), <a href="https://en.wikipedia.org/wiki/Lorem_ipsum" target="_blank">Lorem Ipsum</a> (messages and forum posts), <a href="http://www.cs.virginia.edu/~robins/quotes.html" target="_blank">Dr. Gabriel Robins</a> and <a href="http://en.proverbia.net/shortfamousquotes.asp" target="_blank">Proverbia</a> (lists of quotes), <a href="https://www.youtube.com/" target="_blank">YouTube</a> and <a href="https://vimeo.com/" target="_blank">Vimeo</a> (videos), <a href="https://8biticon.com/" target="_blank">8biticon.com</a> (avatars and plugin icon).
 			</p>
 
 			<?php wp_nonce_field( 'bpdd-admin' ); ?>
