@@ -21,9 +21,25 @@ And turn off email notifications in profile (friendship accepted and messages re
 
 == Installation ==
 
-1. Upload plugin folder `/bp-default-data/` to the `/wp-content/plugins/` directory
-1. Activate the plugin through the 'Plugins' menu in WordPress
-1. Go to "Tools -> BP Default Data" page (if ordinary WP) or "Network Admin -> Settings -> BP Default Data" page (if WPMS) and do what you want.
+= Admin Installer via search =
+1. Visit the Add New plugin screen and search for "buddypress default data".
+2. Click the "Install Now" button.
+3. Activate the plugin.
+4. Navigate to the "Tools > BP Default Data" (if WP) or "Network Admin > Settings > BP Default Data" (if WPMS) menu.
+
+= Admin Installer via zip =
+1. Visit the Add New plugin screen and click the "Upload Plugin" button.
+2. Click the "Browse..." button and select zip file from your computer.
+3. Click "Install Now" button.
+4. Once done uploading, activate BuddyPress Default Data.
+5. Navigate to the "Tools > BP Default Data" (if WP) or "Network Admin > Settings > BP Default Data" (if WPMS) menu.
+
+= Manual =
+1. Upload the BuddyPress Default Data plugin folder to the plugins directory in your WordPress installation.
+2. Activate the plugin.
+3. Navigate to the "Tools > BP Default Data" (if WP) or "Network Admin > Settings > BP Default Data" (if WPMS) menu.
+
+That's it!
 
 == Screenshots ==
 
