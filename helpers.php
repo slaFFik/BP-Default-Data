@@ -58,6 +58,8 @@ function bpdd_clear_db() {
 	foreach ( $sqls as $sql ) {
 		$wpdb->query( $sql );
 	}
+
+	bpdd_delete_import_records();
 }
 
 /**
@@ -168,4 +170,77 @@ function bpdd_get_random_date( $days_from = 30, $days_to = 0 ) {
 	$date_to   = new DateTime( 'now - ' . $days_to . ' days' );
 
 	return date( 'Y-m-d H:i:s', mt_rand( $date_from->getTimestamp(), $date_to->getTimestamp() ) );
+}
+
+/**
+ * Get the current timestamp, using current blog time settings.
+ *
+ * @return int
+ */
+function bpdd_get_time() {
+	return (int) current_time( 'timestamp' );
+}
+
+
+/**
+ * Check whether something was imported or not.
+ *
+ * @param string $group Possible values: users, groups
+ * @param string $import What exactly was imported
+ *
+ * @return bool
+ */
+function bpdd_is_imported( $group, $import ) {
+	$group  = sanitize_key( $group );
+	$import = sanitize_key( $import );
+
+	if ( ! in_array( $group, array( 'users', 'groups' ) ) ) {
+		return false;
+	}
+
+	return array_key_exists( $import, (array) bp_get_option( 'bpdd_import_' . $group ) );
+}
+
+/**
+ * Display a disabled attribute for inputs of the particular value was already imported.
+ *
+ * @param string $group
+ * @param string $import
+ */
+function bpdd_imported_disabled( $group, $import ) {
+	$group  = sanitize_key( $group );
+	$import = sanitize_key( $import );
+
+	if ( ! in_array( $group, array( 'users', 'groups' ) ) ) {
+		echo '';
+	}
+
+	echo bpdd_is_imported( $group, $import ) ? 'disabled="disabled" checked="checked"' : '';
+}
+
+/**
+ * Save when the importing was done.
+ *
+ * @param string $group
+ * @param string $import
+ *
+ * @return bool
+ */
+function bpdd_update_import( $group, $import ) {
+	$group  = sanitize_key( $group );
+	$import = sanitize_key( $import );
+
+	if ( ! in_array( $group, array( 'users', 'groups' ) ) ) {
+		return false;
+	}
+
+	$values            = bp_get_option( 'bpdd_import_' . $group );
+	$values[ $import ] = bpdd_get_time();
+
+	return bp_update_option( 'bpdd_import_' . $group, $values );
+}
+
+function bpdd_delete_import_records() {
+	bp_delete_option( 'bpdd_import_users' );
+	bp_delete_option( 'bpdd_import_groups' );
 }
