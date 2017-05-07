@@ -1,0 +1,17 @@
+{
+  "php": {
+    "version": "5.3"
+  },
+  "wordpress": {
+    "version": "4.2",
+    "plugins": {
+      "buddypress/bp-loader.php": "2.3"
+    }
+  },
+  "params": {
+    "not_valid_actions": [
+      "deactivate",
+      "admin_notice"
+    ]
+  }
+}

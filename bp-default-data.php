@@ -14,6 +14,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+require_once dirname( __FILE__ ) . '/vendor/bemailr/wp-requirements/wpr-loader.php';
+
 define( 'BPDD_VERSION', '1.1.2' );
 
 /**
@@ -33,25 +35,26 @@ add_action( 'plugins_loaded', 'bpdd_load_plugin_textdomain' );
  * @return array
  */
 function bpdd_plugins_settings_link( $links ) {
-	$links['settings'] = '<a href="' . bp_get_admin_url( bpdd_get_root_admin_page() . '?page=bpdd-setup' ) . '">' . __( 'Settings', 'bp-default-data' ) . '</a>';
+	$links['settings'] = '<a href="' . bp_get_admin_url( bpdd_get_root_admin_page() . '?page=bpdd-setup' ) . '">' . __( 'Import Data', 'bp-default-data' ) . '</a>';
 
 	return $links;
 }
-
-add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), 'bpdd_plugins_settings_link' );
 
 /**
  * Load the plugin admin area registration hook.
  */
 function bpdd_init() {
-	add_action( bp_core_admin_hook(), 'bpdd_admin_page', 99 );
+	if ( ! WP_Requirements::validate( __FILE__ ) ) {
+		return;
+	}
 
-	require_once __DIR__ . '/vendor/autoload.php';
+	add_action( bp_core_admin_hook(), 'bpdd_admin_page', 99 );
+	add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), 'bpdd_plugins_settings_link' );
 
 	require_once __DIR__ . '/helpers.php';
 }
 
-add_action( 'bp_init', 'bpdd_init' );
+add_action( 'bp_loaded', 'bpdd_init' );
 
 /**
  * Register admin area page link and its handler.
@@ -101,11 +104,10 @@ function bpdd_admin_page_content() { ?>
 		}
 
 		if ( isset( $_POST['bpdd-admin-submit'] ) ) {
-			// default values
-			$users    = false;
+			// Cound what we have just imported.
 			$imported = array();
 
-			// Check nonce before we do anything
+			// Check nonce before we do anything.
 			check_admin_referer( 'bpdd-admin' );
 
 			include_once __DIR__ . '/process.php';
@@ -185,7 +187,7 @@ function bpdd_admin_page_content() { ?>
 			<script type="text/javascript">
                 jQuery(document).ready(function () {
                     jQuery('#import-profile, #import-friends, #import-activity, #import-messages').click(function () {
-                        if (jQuery(this).attr('checked') === 'checked' && ! jQuery('#import-users').attr('disabled') ) {
+                        if (jQuery(this).attr('checked') === 'checked' && !jQuery('#import-users').attr('disabled')) {
                             jQuery('#import-users').attr('checked', 'checked');
                         }
                     });
@@ -196,7 +198,7 @@ function bpdd_admin_page_content() { ?>
                     });
 
                     jQuery('#import-forums, #import-g-members, #import-g-activity').click(function () {
-                        if (jQuery(this).attr('checked') === 'checked' && ! jQuery('#import-groups').attr('disabled') ) {
+                        if (jQuery(this).attr('checked') === 'checked' && !jQuery('#import-groups').attr('disabled')) {
                             jQuery('#import-groups').attr('checked', 'checked');
                         }
                     });
@@ -231,7 +233,8 @@ function bpdd_admin_page_content() { ?>
 						<?php if ( bp_is_active( 'xprofile' ) ) : ?>
 							<li>
 								<label for="import-profile">
-									<input type="checkbox" name="bpdd[import-profile]" id="import-profile" value="1" <?php bpdd_imported_disabled( 'users', 'xprofile' ) ?>/>
+									<input type="checkbox" name="bpdd[import-profile]" id="import-profile"
+									       value="1" <?php bpdd_imported_disabled( 'users', 'xprofile' ) ?>/>
 									<?php _e( 'Profile data (profile groups and fields with values)', 'bp-default-data' ); ?>
 								</label>
 							</li>
@@ -240,7 +243,8 @@ function bpdd_admin_page_content() { ?>
 						<?php if ( bp_is_active( 'friends' ) ) : ?>
 							<li>
 								<label for="import-friends">
-									<input type="checkbox" name="bpdd[import-friends]" id="import-friends" value="1" <?php bpdd_imported_disabled( 'users', 'friends' ) ?>/>
+									<input type="checkbox" name="bpdd[import-friends]" id="import-friends"
+									       value="1" <?php bpdd_imported_disabled( 'users', 'friends' ) ?>/>
 									<?php _e( 'Friends connections', 'bp-default-data' ); ?>
 								</label>
 							</li>
@@ -249,7 +253,8 @@ function bpdd_admin_page_content() { ?>
 						<?php if ( bp_is_active( 'activity' ) ) : ?>
 							<li>
 								<label for="import-activity">
-									<input type="checkbox" name="bpdd[import-activity]" id="import-activity" value="1" <?php bpdd_imported_disabled( 'users', 'activity' ) ?>/>
+									<input type="checkbox" name="bpdd[import-activity]" id="import-activity"
+									       value="1" <?php bpdd_imported_disabled( 'users', 'activity' ) ?>/>
 									<?php _e( 'Activity posts', 'bp-default-data' ); ?>
 								</label>
 							</li>
@@ -258,7 +263,8 @@ function bpdd_admin_page_content() { ?>
 						<?php if ( bp_is_active( 'messages' ) ) : ?>
 							<li>
 								<label for="import-messages">
-									<input type="checkbox" name="bpdd[import-messages]" id="import-messages" value="1" <?php bpdd_imported_disabled( 'users', 'messages' ) ?>/>
+									<input type="checkbox" name="bpdd[import-messages]" id="import-messages"
+									       value="1" <?php bpdd_imported_disabled( 'users', 'messages' ) ?>/>
 									<?php _e( 'Private messages', 'bp-default-data' ); ?>
 								</label>
 							</li>
@@ -270,13 +276,15 @@ function bpdd_admin_page_content() { ?>
 				<?php if ( bp_is_active( 'groups' ) ) : ?>
 					<li class="groups">
 						<label for="import-groups">
-							<input type="checkbox" name="bpdd[import-groups]" id="import-groups" value="1" <?php bpdd_imported_disabled( 'groups', 'groups' ) ?>/>
+							<input type="checkbox" name="bpdd[import-groups]" id="import-groups"
+							       value="1" <?php bpdd_imported_disabled( 'groups', 'groups' ) ?>/>
 							<?php _e( 'Groups', 'bp-default-data' ); ?></label>
 						<ul>
 
 							<li>
 								<label for="import-g-members">
-									<input type="checkbox" name="bpdd[import-g-members]" id="import-g-members" value="1" <?php bpdd_imported_disabled( 'groups', 'members' ) ?>/>
+									<input type="checkbox" name="bpdd[import-g-members]" id="import-g-members"
+									       value="1" <?php bpdd_imported_disabled( 'groups', 'members' ) ?>/>
 									<?php _e( 'Members', 'bp-default-data' ); ?>
 								</label>
 							</li>
@@ -284,7 +292,8 @@ function bpdd_admin_page_content() { ?>
 							<?php if ( bp_is_active( 'activity' ) ) : ?>
 								<li>
 									<label for="import-g-activity">
-										<input type="checkbox" name="bpdd[import-g-activity]" id="import-g-activity" value="1" <?php bpdd_imported_disabled( 'groups', 'activity' ) ?>/>
+										<input type="checkbox" name="bpdd[import-g-activity]" id="import-g-activity"
+										       value="1" <?php bpdd_imported_disabled( 'groups', 'activity' ) ?>/>
 										<?php _e( 'Activity posts', 'bp-default-data' ); ?>
 									</label>
 								</li>
@@ -293,7 +302,8 @@ function bpdd_admin_page_content() { ?>
 							<?php if ( bp_is_active( 'forums' ) && bp_forums_is_installed_correctly() ) : ?>
 								<li>
 									<label for="import-forums">
-										<input type="checkbox" disabled name="bpdd[import-forums]" id="import-forums" value="1" <?php bpdd_imported_disabled( 'groups', 'forums' ) ?>/>
+										<input type="checkbox" disabled name="bpdd[import-forums]" id="import-forums"
+										       value="1" <?php bpdd_imported_disabled( 'groups', 'forums' ) ?>/>
 										<?php _e( 'Forum topics and posts', 'bp-default-data' ); ?>
 									</label>
 								</li>
@@ -325,7 +335,14 @@ function bpdd_admin_page_content() { ?>
 			</fieldset>
 
 			<p class="description">
-				Many thanks to <a href="http://imdb.com" target="_blank">IMDB.com</a> for movies titles (groups names), <a href="https://en.wikipedia.org" target="_blank">Wikipedia.org</a> (users names), <a href="https://en.wikipedia.org/wiki/Lorem_ipsum" target="_blank">Lorem Ipsum</a> (messages and forum posts), <a href="http://www.cs.virginia.edu/~robins/quotes.html" target="_blank">Dr. Gabriel Robins</a> and <a href="http://en.proverbia.net/shortfamousquotes.asp" target="_blank">Proverbia</a> (lists of quotes), <a href="https://www.youtube.com/" target="_blank">YouTube</a> and <a href="https://vimeo.com/" target="_blank">Vimeo</a> (videos), <a href="https://8biticon.com/" target="_blank">8biticon.com</a> (avatars and plugin icon).
+				Many thanks to <a href="http://imdb.com" target="_blank">IMDB.com</a> for movies titles (groups names), <a href="https://en.wikipedia.org"
+				                                                                                                           target="_blank">Wikipedia.org</a>
+				(users names), <a href="https://en.wikipedia.org/wiki/Lorem_ipsum" target="_blank">Lorem Ipsum</a> (messages and forum posts), <a
+						href="http://www.cs.virginia.edu/~robins/quotes.html" target="_blank">Dr. Gabriel Robins</a> and <a
+						href="http://en.proverbia.net/shortfamousquotes.asp" target="_blank">Proverbia</a> (lists of quotes), <a href="https://www.youtube.com/"
+				                                                                                                                 target="_blank">YouTube</a> and
+				<a href="https://vimeo.com/" target="_blank">Vimeo</a> (videos), <a href="https://8biticon.com/" target="_blank">8biticon.com</a> (avatars and
+				plugin icon).
 			</p>
 
 			<?php wp_nonce_field( 'bpdd-admin' ); ?>

@@ -1,0 +1,29 @@
+[
+    {
+        "name": "bemailr/wp-requirements",
+        "version": "2.0.3",
+        "version_normalized": "2.0.3.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/bemailr/wp-requirements.git",
+            "reference": "e903973b0dfc1178f89c757bd205327811ea4658"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/bemailr/wp-requirements/zipball/e903973b0dfc1178f89c757bd205327811ea4658",
+            "reference": "e903973b0dfc1178f89c757bd205327811ea4658",
+            "shasum": ""
+        },
+        "time": "2016-10-18T23:09:16+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "GPL-3.0"
+        ],
+        "description": "A helpful library for checking the prerequisites when activating / running a WordPress plugin.",
+        "keywords": [
+            "wordpress"
+        ]
+    }
+]
