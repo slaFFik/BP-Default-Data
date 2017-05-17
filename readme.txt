@@ -3,7 +3,7 @@ Contributors: slaFFik
 Tags: buddypress, members, groups, bulk, messages, activity, forums, posts
 Requires at least: WordPress 4.4
 Tested up to: 4.7
-Stable tag: 1.1.2
+Stable tag: 1.2.0
 
 Plugin will create lots of users, messages, friends connections, groups, topics, activity items, profile data - useful for testing purpose.
 
@@ -47,8 +47,16 @@ That's it!
 
 == Changelog ==
 
-= 1.2.0 (..2017) =
+= 1.2.0 (17.05.2017) =
+* Smarter data deletion - delete only IMPORTED data, and not everything
+* Save, what was already imported, and prevent data duplication (re-run won't re-import data)
+* Use <a href="https://github.com/bemailr/wp-requirements">bemailr/wp-requirements</a> to activate the plugin only when it's done on supported WP/BP versions
+* Better code structure, easier to work with for future improvements (more to come)
+* Improved labels for better readability
+* Add "Import Data" quick link for BPDD plugin on Plugins page
 * Improved plugin installation instructions
+* More clear text what will be deleted
+* Lots of other minor improvements everywhere
 
 = 1.1.2 (19.04.2017) =
 * Better active components check - no more failing if (for example) xProfile is disabled

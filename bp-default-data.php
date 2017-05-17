@@ -1,10 +1,10 @@
 <?php
 /**
  * Plugin Name: BuddyPress Default Data
- * Plugin URI:  http://ovirium.com
- * Description: Plugin will create lots of users, groups, topics, activity items, profile data - useful for testing purpose.
+ * Plugin URI:  https://ovirium.com
+ * Description: Create lots of users, groups, activity items, messages, profile data - useful for BuddyPress testing purpose.
  * Author:      slaFFik
- * Version:     1.1.2
+ * Version:     1.2.0
  * Author URI:  https://ovirium.com
  * Text Domain: bp-default-data
  */
@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 require_once dirname( __FILE__ ) . '/vendor/bemailr/wp-requirements/wpr-loader.php';
 
-define( 'BPDD_VERSION', '1.1.2' );
+define( 'BPDD_VERSION', '1.2.0' );
 
 /**
  * Make the plugin translatable.
