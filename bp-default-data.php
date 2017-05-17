@@ -209,7 +209,7 @@ function bpdd_admin_page_content() { ?>
                     });
 
                     jQuery("#bpdd-admin-clear").click(function () {
-                        if (confirm('<?php echo esc_js( __( 'Are you sure you want to delete all users (except one with ID=1), groups, messages, activities, forum topics etc?', 'bp-default-data' ) ); ?>')) {
+                        if (confirm('<?php echo esc_js( __( 'Are you sure you want to delete all *imported* content - users, groups, messages, activities, forum topics etc? Content, that was created by you and others, and not by this plugin, will not be deleted.', 'bp-default-data' ) ); ?>')) {
                             return true;
                         }
 

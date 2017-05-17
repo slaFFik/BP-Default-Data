@@ -24,19 +24,18 @@ function bpdd_import_users() {
 		update_user_meta( $user_id, 'first_name', $name[0] );
 		update_user_meta( $user_id, 'last_name', isset( $name[1] ) ? $name[1] : '' );
 
-		// BuddyPress 1.9+
-		if ( function_exists( 'bp_update_user_last_activity' ) ) {
-			bp_update_user_last_activity( $user_id, bpdd_get_random_date( 5 ) );
-		} else {
-			// BuddyPress 1.8.x and below
-			bp_update_user_meta( $user_id, 'last_activity', bpdd_get_random_date( 5 ) );
-		}
+		bp_update_user_last_activity( $user_id, bpdd_get_random_date( 5 ) );
 
 		bp_update_user_meta( $user_id, 'notification_messages_new_message', 'no' );
 		bp_update_user_meta( $user_id, 'notification_friends_friendship_request', 'no' );
 		bp_update_user_meta( $user_id, 'notification_friends_friendship_accepted', 'no' );
 
 		$users[] = $user_id;
+	}
+
+	if ( ! empty( $users ) ) {
+		/** @noinspection PhpParamsInspection */
+		bp_update_option( 'bpdd_imported_user_ids', $users );
 	}
 
 	return $users;
@@ -58,14 +57,15 @@ function bpdd_import_users_profile() {
 
 	$xprofile_structure = require_once( dirname( __FILE__ ) . '/data/xprofile_structure.php' );
 
-	// first import profile groups
+	// Firstly, import profile groups.
 	foreach ( $xprofile_structure as $group_type => $group_data ) {
 		$group_id = xprofile_insert_field_group( array(
 			                                         'name'        => $group_data['name'],
 			                                         'description' => $group_data['desc'],
 		                                         ) );
+		$groups[] = $group_id;
 
-		// then import fields
+		// Then import fields.
 		foreach ( $group_data['fields'] as $field_type => $field_data ) {
 			$field_id = xprofile_insert_field( array(
 				                                   'field_group_id' => $group_id,
@@ -109,7 +109,7 @@ function bpdd_import_users_profile() {
 	$xprofile_data = require_once( dirname( __FILE__ ) . '/data/xprofile_data.php' );
 	$users         = bpdd_get_random_users_ids( 0 );
 
-	// now import profile fields data for all fields for each user
+	// Now import profile fields data for all fields for each user.
 	foreach ( $users as $user_id ) {
 		foreach ( $data as $field_id => $field_data ) {
 			switch ( $field_data['type'] ) {
@@ -133,6 +133,11 @@ function bpdd_import_users_profile() {
 					break;
 			}
 		}
+	}
+
+	if ( ! empty( $groups ) ) {
+		/** @noinspection PhpParamsInspection */
+		bp_update_option( 'bpdd_imported_user_xprofile_ids', $groups );
 	}
 
 	return $count;
@@ -193,6 +198,11 @@ function bpdd_import_users_messages() {
 		                                    'content'    => $messages_content[ array_rand( $messages_content ) ],
 		                                    'date_sent'  => bpdd_get_random_date( 5 ),
 	                                    ) );
+
+	if ( ! empty( $messages ) ) {
+		/** @noinspection PhpParamsInspection */
+		bp_update_option( 'bpdd_imported_user_messages_ids', $messages );
+	}
 
 	return $messages;
 }
@@ -280,6 +290,7 @@ function bpdd_import_groups( $users = false ) {
 		return $group_ids;
 	}
 
+	// Use currently available users from DB if no default were specified.
 	if ( empty( $users ) ) {
 		$users = get_users();
 	}
@@ -298,7 +309,6 @@ function bpdd_import_groups( $users = false ) {
 			                                   'enable_forum' => $group['enable_forum']
 		                                   ) );
 
-		groups_update_groupmeta( $cur, 'total_member_count', 1 );
 		groups_update_groupmeta( $cur, 'last_activity', bpdd_get_random_date( 10 ) );
 
 		// create forums if Forum Component is active
@@ -307,6 +317,11 @@ function bpdd_import_groups( $users = false ) {
 		}
 
 		$group_ids[] = $cur;
+	}
+
+	if ( ! empty( $group_ids ) ) {
+		/** @noinspection PhpParamsInspection */
+		bp_update_option( 'bpdd_imported_group_ids', $group_ids );
 	}
 
 	return $group_ids;
@@ -377,10 +392,9 @@ function bpdd_import_groups_members( $groups = false ) {
 	add_filter( 'bp_after_activity_add_parse_args', 'bpdd_groups_join_group_date_fix' );
 
 	foreach ( $groups as $group_id ) {
-		$user_ids = bpdd_get_random_users_ids( rand( 2, 15 ) );
+		$user_ids = bpdd_get_random_users_ids( mt_rand( 2, 15 ) );
 
 		foreach ( $user_ids as $user_id ) {
-
 			if ( groups_join_group( $group_id, $user_id ) ) {
 				$members[] = $group_id;
 			}

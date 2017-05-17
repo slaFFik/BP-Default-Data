@@ -9,54 +9,76 @@ function bpdd_get_root_admin_page() {
 }
 
 /**
- * Delete all imported information (will be hugely rewritten).
+ * Delete all imported information.
  */
 function bpdd_clear_db() {
 	global $wpdb;
+	$bp = buddypress();
 
-	$prefix = bp_core_get_table_prefix();
-
-	if ( bp_is_active( 'activity' ) ) {
-		$sqls[] = "TRUNCATE TABLE {$prefix}bp_activity;";
-		$sqls[] = "TRUNCATE TABLE {$prefix}bp_activity_meta;";
+	/*
+	 * Groups
+	 */
+	$groups = bp_get_option( 'bpdd_imported_group_ids' );
+	if ( ! empty( $groups ) ) {
+		foreach ( (array) $groups as $group_id ) {
+			groups_delete_group( $group_id );
+		}
 	}
 
-	if ( bp_is_active( 'groups' ) ) {
-		$sqls[] = "TRUNCATE TABLE {$prefix}bp_groups;";
-		$sqls[] = "TRUNCATE TABLE {$prefix}bp_groups_members;";
-		$sqls[] = "TRUNCATE TABLE {$prefix}bp_groups_groupmeta;";
+	/*
+	 * Users and all their data.
+	 */
+	$users = bp_get_option( 'bpdd_imported_user_ids' );
+	if ( ! empty( $users ) ) {
+		$users_str = implode( ',', (array) $users );
+
+		foreach ( (array) $users as $user_id ) {
+			bp_core_delete_account( $user_id );
+		}
 	}
 
-	if ( bp_is_active( 'messages' ) ) {
-		$sqls[] = "TRUNCATE TABLE {$prefix}bp_messages_recipients;";
-		$sqls[] = "TRUNCATE TABLE {$prefix}bp_messages_messages;";
+	/*
+	 * PRIVATE MESSAGES are not deleted by BuddyPress when user is deleted, for some reason.
+	 * This is a BuddyPress bug, and the fix below will stay here for some time
+	 */
+	$thread_ids = bp_get_option( 'bpdd_imported_user_messages_ids' );
+	if ( ! empty( $thread_ids ) && ! empty( $users_str ) ) {
+		$threads_str = implode( ',', (array) $thread_ids );
+
+		// Finally, remove from the DB completely.
+		foreach ( $thread_ids as $thread_id ) {
+			// Get the message ids in order to delete their metas.
+			$message_ids = $wpdb->get_col( $wpdb->prepare(
+				"SELECT id FROM {$bp->messages->table_name_messages} 
+				WHERE thread_id = %d",
+				$thread_id ) );
+
+			// Delete all the messages.
+			$wpdb->query( $wpdb->prepare(
+				"DELETE FROM {$bp->messages->table_name_messages} 
+				WHERE thread_id = %d",
+				$thread_id ) );
+
+			// Delete message meta.
+			foreach ( $message_ids as $message_id ) {
+				bp_messages_delete_meta( $message_id );
+			}
+
+			// Delete all the recipients.
+			$wpdb->query( $wpdb->prepare(
+				"DELETE FROM {$bp->messages->table_name_recipients} 
+				WHERE thread_id = %d",
+				$thread_id ) );
+		}
 	}
 
-	if ( bp_is_active( 'friends' ) ) {
-		$sqls[] = "TRUNCATE TABLE {$prefix}bp_friends;";
-	}
-
-	if ( bp_is_active( 'xprofile' ) ) {
-		$sqls[] = "DELETE FROM {$prefix}bp_xprofile_data WHERE user_id > 1 OR field_id > 1;";
-		$sqls[] = "DELETE FROM {$prefix}bp_xprofile_fields WHERE id > 1;";
-		$sqls[] = "DELETE FROM {$prefix}bp_xprofile_groups WHERE id > 1;";
-		$sqls[] = "DELETE FROM {$prefix}bp_xprofile_meta WHERE object_id > 1;";
-	}
-
-	if ( bp_is_active( 'forums' ) && bp_forums_is_installed_correctly() ) {
-		$sqls[] = "TRUNCATE TABLE {$prefix}bb_posts;";
-		$sqls[] = "DELETE FROM {$prefix}bb_forums WHERE forum_id > 1;";
-	}
-
-	$sqls[] = "TRUNCATE TABLE {$prefix}bp_notifications;";
-	$sqls[] = "DELETE FROM {$wpdb->prefix}users WHERE ID > 1;";
-	$sqls[] = "DELETE FROM {$wpdb->prefix}usermeta WHERE user_id > 1;";
-	$sqls[] = "DELETE FROM {$wpdb->prefix}usermeta WHERE meta_key = 'total_friend_count';";
-	$sqls[] = "DELETE FROM {$wpdb->prefix}usermeta WHERE meta_key = 'bp_latest_update';";
-	$sqls[] = "DELETE FROM {$wpdb->prefix}usermeta WHERE meta_key = 'last_activity';";
-
-	foreach ( $sqls as $sql ) {
-		$wpdb->query( $sql );
+	/*
+	 * xProfile groups and fields, metas are not deleted - it's a BuddyPress bug.
+	 */
+	$xprofile_ids = bp_get_option( 'bpdd_imported_user_xprofile_ids' );
+	foreach ( (array) $xprofile_ids as $xprofile_id ) {
+		$group = new BP_XProfile_Group( $xprofile_id );
+		$group->delete();
 	}
 
 	bpdd_delete_import_records();
@@ -95,19 +117,38 @@ function bpdd_friends_add_friend_date_fix( $current_time ) {
  * Get the array (or a string) of group IDs.
  *
  * @param int $count If you need all, use 0.
- * @param string $output
+ * @param string $output What to return: 'array' or 'string'. If string - comma separated.
  *
  * @return array|string Default is array.
  */
 function bpdd_get_random_groups_ids( $count = 1, $output = 'array' ) {
-	global $wpdb;
-	$limit = '';
+	$groups_arr = (array) bp_get_option( 'bpdd_imported_group_ids' );
 
-	if ( $count > 0 ) {
-		$limit = ' LIMIT ' . $count;
+	if ( ! empty( $groups_arr ) ) {
+		$total_groups = count( $groups_arr );
+		if ( $count <= 0 || $count > $total_groups ) {
+			$count = $total_groups;
+		}
+
+		// Get random groups.
+		$random_keys = (array) array_rand( $groups_arr, $count );
+		$groups      = array();
+		foreach ( $groups_arr as $key => $value ) {
+			if ( in_array( $key, $random_keys ) ) {
+				$groups[] = $value;
+			}
+		}
+	} else {
+		global $wpdb;
+		$bp = buddypress();
+
+		$limit = '';
+		if ( $count > 0 ) {
+			$limit = 'LIMIT ' . (int) $count;
+		}
+
+		$groups = $wpdb->get_col( "SELECT id FROM {$bp->groups->table_name} ORDER BY rand() {$limit}" );
 	}
-
-	$groups = $wpdb->get_col( "SELECT id FROM {$wpdb->prefix}bp_groups ORDER BY rand() {$limit}" );
 
 	/*
 	 * Convert to integers, because get_col() returns array of strings.
@@ -125,22 +166,36 @@ function bpdd_get_random_groups_ids( $count = 1, $output = 'array' ) {
  * Get the array (or a string) of user IDs.
  *
  * @param int $count If you need all, use 0.
- * @param string $output
+ * @param string $output What to return: 'array' or 'string'. If string - comma separated.
  *
  * @return array|string Default is array.
  */
 function bpdd_get_random_users_ids( $count = 1, $output = 'array' ) {
-	global $wpdb;
-	$limit = '';
+	$users_arr = (array) bp_get_option( 'bpdd_imported_user_ids' );
 
-	if ( $count > 0 ) {
-		$limit = ' LIMIT ' . $count;
+	if ( ! empty( $users_arr ) ) {
+		$total_members = count( $users_arr );
+		if ( $count <= 0 || $count > $total_members ) {
+			$count = $total_members;
+		}
+
+		// Get random users.
+		$random_keys = (array) array_rand( $users_arr, $count );
+		$users       = array();
+		foreach ( $users_arr as $key => $value ) {
+			if ( in_array( $key, $random_keys ) ) {
+				$users[] = $value;
+			}
+		}
+	} else {
+		// Get by default (if no users were imported) all currently registered users.
+		$users = get_users( array(
+			                    'fields' => 'ID',
+		                    ) );
 	}
 
-	$users = $wpdb->get_col( "SELECT ID FROM {$wpdb->users} ORDER BY rand() {$limit}" );
-
 	/*
-	 * Convert to integers, because get_col() returns array of strings.
+	 * Convert to integers, because get_col() and get_users() return array of strings.
 	 */
 	$users = array_map( 'intval', $users );
 
@@ -240,7 +295,16 @@ function bpdd_update_import( $group, $import ) {
 	return bp_update_option( 'bpdd_import_' . $group, $values );
 }
 
+/**
+ * Remove all imported ids and the indication, that importing was done.
+ */
 function bpdd_delete_import_records() {
 	bp_delete_option( 'bpdd_import_users' );
 	bp_delete_option( 'bpdd_import_groups' );
+
+	bp_delete_option( 'bpdd_imported_user_ids' );
+	bp_delete_option( 'bpdd_imported_group_ids' );
+
+	bp_delete_option( 'bpdd_imported_user_messages_ids' );
+	bp_delete_option( 'bpdd_imported_user_xprofile_ids' );
 }
