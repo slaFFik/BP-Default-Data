@@ -2,9 +2,11 @@
 
 /**
  * Get plugin admin area root page: settings.php for WPMS and tool.php for WP.
+ *
  * @return string
  */
 function bpdd_get_root_admin_page() {
+
 	return is_multisite() ? 'settings.php' : 'tools.php';
 }
 
@@ -12,6 +14,7 @@ function bpdd_get_root_admin_page() {
  * Delete all imported information.
  */
 function bpdd_clear_db() {
+
 	global $wpdb;
 	$bp = buddypress();
 
@@ -92,6 +95,7 @@ function bpdd_clear_db() {
  * @return array
  */
 function bpdd_groups_join_group_date_fix( $args ) {
+
 	if (
 		$args['type'] === 'joined_group' &&
 		$args['component'] === 'groups'
@@ -110,18 +114,20 @@ function bpdd_groups_join_group_date_fix( $args ) {
  * @return string
  */
 function bpdd_friends_add_friend_date_fix( $current_time ) {
+
 	return bpdd_get_random_date( 43 );
 }
 
 /**
  * Get the array (or a string) of group IDs.
  *
- * @param int $count If you need all, use 0.
+ * @param int    $count  If you need all, use 0.
  * @param string $output What to return: 'array' or 'string'. If string - comma separated.
  *
  * @return array|string Default is array.
  */
 function bpdd_get_random_groups_ids( $count = 1, $output = 'array' ) {
+
 	$groups_arr = (array) bp_get_option( 'bpdd_imported_group_ids' );
 
 	if ( ! empty( $groups_arr ) ) {
@@ -134,7 +140,7 @@ function bpdd_get_random_groups_ids( $count = 1, $output = 'array' ) {
 		$random_keys = (array) array_rand( $groups_arr, $count );
 		$groups      = array();
 		foreach ( $groups_arr as $key => $value ) {
-			if ( in_array( $key, $random_keys ) ) {
+			if ( in_array( $key, $random_keys, true ) ) {
 				$groups[] = $value;
 			}
 		}
@@ -165,12 +171,13 @@ function bpdd_get_random_groups_ids( $count = 1, $output = 'array' ) {
 /**
  * Get the array (or a string) of user IDs.
  *
- * @param int $count If you need all, use 0.
+ * @param int    $count  If you need all, use 0.
  * @param string $output What to return: 'array' or 'string'. If string - comma separated.
  *
  * @return array|string Default is array.
  */
 function bpdd_get_random_users_ids( $count = 1, $output = 'array' ) {
+
 	$users_arr = (array) bp_get_option( 'bpdd_imported_user_ids' );
 
 	if ( ! empty( $users_arr ) ) {
@@ -216,6 +223,7 @@ function bpdd_get_random_users_ids( $count = 1, $output = 'array' ) {
  * @return string
  */
 function bpdd_get_random_date( $days_from = 30, $days_to = 0 ) {
+
 	// $days_from should always be less than $days_to
 	if ( $days_to > $days_from ) {
 		$days_to = $days_from - 1;
@@ -233,6 +241,7 @@ function bpdd_get_random_date( $days_from = 30, $days_to = 0 ) {
  * @return int
  */
 function bpdd_get_time() {
+
 	return (int) current_time( 'timestamp' );
 }
 
@@ -240,12 +249,13 @@ function bpdd_get_time() {
 /**
  * Check whether something was imported or not.
  *
- * @param string $group Possible values: users, groups
+ * @param string $group  Possible values: users, groups
  * @param string $import What exactly was imported
  *
  * @return bool
  */
 function bpdd_is_imported( $group, $import ) {
+
 	$group  = sanitize_key( $group );
 	$import = sanitize_key( $import );
 
@@ -263,6 +273,7 @@ function bpdd_is_imported( $group, $import ) {
  * @param string $import
  */
 function bpdd_imported_disabled( $group, $import ) {
+
 	$group  = sanitize_key( $group );
 	$import = sanitize_key( $import );
 
@@ -300,6 +311,7 @@ function bpdd_update_import( $group, $import ) {
  * Remove all imported ids and the indication, that importing was done.
  */
 function bpdd_delete_import_records() {
+
 	bp_delete_option( 'bpdd_import_users' );
 	bp_delete_option( 'bpdd_import_groups' );
 

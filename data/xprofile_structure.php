@@ -161,7 +161,7 @@ return array(
 );
 
 /**
- * <select style="width: 30%" onchange="show_options(this.value)" id="fieldtype" name="fieldtype">
+ * <select id="fieldtype" name="fieldtype">
  *  <optgroup label="Multi Fields">
  *      <option value="checkbox">Checkboxes</option>
  *      <option value="selectbox">Drop Down Select Box</option>

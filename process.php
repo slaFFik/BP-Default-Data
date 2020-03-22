@@ -4,9 +4,10 @@
  *  Importer engine - USERS
  */
 function bpdd_import_users() {
+
 	$users = array();
 
-	$users_data = require_once( dirname( __FILE__ ) . '/data/users.php' );
+	$users_data = require dirname( __FILE__ ) . '/data/users.php';
 
 	foreach ( $users_data as $user ) {
 		$user_id = wp_insert_user( array(
@@ -34,7 +35,6 @@ function bpdd_import_users() {
 	}
 
 	if ( ! empty( $users ) ) {
-		/** @noinspection PhpParamsInspection */
 		bp_update_option( 'bpdd_imported_user_ids', $users );
 	}
 
@@ -47,6 +47,7 @@ function bpdd_import_users() {
  * @return int
  */
 function bpdd_import_users_profile() {
+
 	$count = 0;
 
 	if ( ! bp_is_active( 'xprofile' ) ) {
@@ -55,7 +56,7 @@ function bpdd_import_users_profile() {
 
 	$data = array();
 
-	$xprofile_structure = require_once( dirname( __FILE__ ) . '/data/xprofile_structure.php' );
+	$xprofile_structure = require dirname( __FILE__ ) . '/data/xprofile_structure.php';
 
 	// Firstly, import profile groups.
 	foreach ( $xprofile_structure as $group_type => $group_data ) {
@@ -106,7 +107,7 @@ function bpdd_import_users_profile() {
 		}
 	}
 
-	$xprofile_data = require_once( dirname( __FILE__ ) . '/data/xprofile_data.php' );
+	$xprofile_data = require dirname( __FILE__ ) . '/data/xprofile_data.php';
 	$users         = bpdd_get_random_users_ids( 0 );
 
 	// Now import profile fields data for all fields for each user.
@@ -136,7 +137,6 @@ function bpdd_import_users_profile() {
 	}
 
 	if ( ! empty( $groups ) ) {
-		/** @noinspection PhpParamsInspection */
 		bp_update_option( 'bpdd_imported_user_xprofile_ids', $groups );
 	}
 
@@ -149,6 +149,7 @@ function bpdd_import_users_profile() {
  * @return array
  */
 function bpdd_import_users_messages() {
+
 	$messages = array();
 
 	if ( ! bp_is_active( 'messages' ) ) {
@@ -157,7 +158,7 @@ function bpdd_import_users_messages() {
 
 	/** @var $messages_subjects array */
 	/** @var $messages_content array */
-	require( dirname( __FILE__ ) . '/data/messages.php' );
+	require dirname( __FILE__ ) . '/data/messages.php';
 
 
 	// first level messages
@@ -200,7 +201,6 @@ function bpdd_import_users_messages() {
 	                                    ) );
 
 	if ( ! empty( $messages ) ) {
-		/** @noinspection PhpParamsInspection */
 		bp_update_option( 'bpdd_imported_user_messages_ids', $messages );
 	}
 
@@ -213,6 +213,7 @@ function bpdd_import_users_messages() {
  * @return int Number of activity records that were inserted into the database.
  */
 function bpdd_import_users_activity() {
+
 	$count = 0;
 
 	if ( ! bp_is_active( 'activity' ) ) {
@@ -222,7 +223,7 @@ function bpdd_import_users_activity() {
 	$users = bpdd_get_random_users_ids( 0 );
 
 	/** @var $activity array */
-	require( dirname( __FILE__ ) . '/data/activity.php' );
+	require dirname( __FILE__ ) . '/data/activity.php';
 
 	for ( $i = 0; $i < 75; $i ++ ) {
 		$user    = $users[ array_rand( $users ) ];
@@ -250,6 +251,7 @@ function bpdd_import_users_activity() {
  * @return int
  */
 function bpdd_import_users_friends() {
+
 	$count = 0;
 
 	if ( ! bp_is_active( 'friends' ) ) {
@@ -283,6 +285,7 @@ function bpdd_import_users_friends() {
  * @return array
  */
 function bpdd_import_groups( $users = false ) {
+
 	$groups    = array();
 	$group_ids = array();
 
@@ -295,7 +298,7 @@ function bpdd_import_groups( $users = false ) {
 		$users = get_users();
 	}
 
-	require( dirname( __FILE__ ) . '/data/groups.php' );
+	require dirname( __FILE__ ) . '/data/groups.php';
 
 	foreach ( $groups as $group ) {
 		$creator_id = is_object( $users[ array_rand( $users ) ] ) ? $users[ array_rand( $users ) ]->ID : $users[ array_rand( $users ) ];
@@ -306,13 +309,17 @@ function bpdd_import_groups( $users = false ) {
 			                                   'slug'         => groups_check_slug( sanitize_title( esc_attr( $group['name'] ) ) ),
 			                                   'status'       => $group['status'],
 			                                   'date_created' => bpdd_get_random_date( 30, 5 ),
-			                                   'enable_forum' => $group['enable_forum']
+			                                   'enable_forum' => $group['enable_forum'],
 		                                   ) );
 
 		groups_update_groupmeta( $cur, 'last_activity', bpdd_get_random_date( 10 ) );
 
-		// create forums if Forum Component is active
-		if ( bp_is_active( 'forums' ) && bp_forums_is_installed_correctly() ) {
+		// Create forums if Forum Component is active.
+		if (
+			bp_is_active( 'forums' ) &&
+			function_exists( 'bp_forums_is_installed_correctly' ) && bp_forums_is_installed_correctly() &&
+			function_exists( 'groups_new_group_forum' )
+		) {
 			groups_new_group_forum( $cur, $group['name'], $group['description'] );
 		}
 
@@ -320,7 +327,6 @@ function bpdd_import_groups( $users = false ) {
 	}
 
 	if ( ! empty( $group_ids ) ) {
-		/** @noinspection PhpParamsInspection */
 		bp_update_option( 'bpdd_imported_group_ids', $group_ids );
 	}
 
@@ -333,6 +339,7 @@ function bpdd_import_groups( $users = false ) {
  * @return int
  */
 function bpdd_import_groups_activity() {
+
 	$count = 0;
 
 	if ( ! bp_is_active( 'groups' ) || ! bp_is_active( 'activity' ) ) {
@@ -343,7 +350,7 @@ function bpdd_import_groups_activity() {
 	$groups = bpdd_get_random_groups_ids( 0 );
 
 	/** @var $activity array */
-	require( dirname( __FILE__ ) . '/data/activity.php' );
+	require dirname( __FILE__ ) . '/data/activity.php';
 
 	for ( $i = 0; $i < 150; $i ++ ) {
 		$user_id  = $users[ array_rand( $users ) ];
@@ -379,6 +386,7 @@ function bpdd_import_groups_activity() {
  * @return array
  */
 function bpdd_import_groups_members( $groups = false ) {
+
 	$members = array();
 
 	if ( ! bp_is_active( 'groups' ) ) {
@@ -392,7 +400,7 @@ function bpdd_import_groups_members( $groups = false ) {
 	add_filter( 'bp_after_activity_add_parse_args', 'bpdd_groups_join_group_date_fix' );
 
 	foreach ( $groups as $group_id ) {
-		$user_ids = bpdd_get_random_users_ids( mt_rand( 2, 15 ) );
+		$user_ids = bpdd_get_random_users_ids( wp_rand( 2, 15 ) );
 
 		foreach ( $user_ids as $user_id ) {
 			if ( groups_join_group( $group_id, $user_id ) ) {
@@ -414,9 +422,7 @@ function bpdd_import_groups_members( $groups = false ) {
  *
  * @return bool
  */
-function bpdd_import_groups_forums(
-	/** @noinspection PhpUnusedParameterInspection */
-	$groups
-) {
+function bpdd_import_groups_forums( $groups ) {
+
 	return true;
 }
