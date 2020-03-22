@@ -99,7 +99,7 @@ function bpdd_admin_page_content() { ?>
 				margin-left: 25px
 			}
 		</style>
-		<h2><?php esc_html_e( 'BuddyPress Default Data', 'bp-default-data' ); ?> <sup>v<?php echo BPDD_VERSION ?></sup></h2>
+		<h1><?php esc_html_e( 'BuddyPress Default Data', 'bp-default-data' ); ?> <sup>v<?php echo BPDD_VERSION ?></sup></h1>
 
 		<?php
 		if ( ! empty( $_POST['bpdd-admin-clear'] ) ) {
