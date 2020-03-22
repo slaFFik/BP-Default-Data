@@ -282,6 +282,7 @@ function bpdd_imported_disabled( $group, $import ) {
  * @return bool
  */
 function bpdd_update_import( $group, $import ) {
+
 	$group  = sanitize_key( $group );
 	$import = sanitize_key( $import );
 
@@ -289,7 +290,7 @@ function bpdd_update_import( $group, $import ) {
 		return false;
 	}
 
-	$values            = bp_get_option( 'bpdd_import_' . $group );
+	$values            = bp_get_option( 'bpdd_import_' . $group, array() );
 	$values[ $import ] = bpdd_get_time();
 
 	return bp_update_option( 'bpdd_import_' . $group, $values );
