@@ -112,10 +112,11 @@ function bpdd_groups_join_group_date_fix( $args ) {
  * @param string $current_time Default BuddyPress current timestamp.
  *
  * @return string
+ * @throws \Exception
  */
 function bpdd_friends_add_friend_date_fix( $current_time ) {
 
-	return bpdd_get_random_date( 43 );
+	return strtotime( bpdd_get_random_date( 43 ) );
 }
 
 /**
@@ -214,13 +215,14 @@ function bpdd_get_random_users_ids( $count = 1, $output = 'array' ) {
 }
 
 /**
- * Get a random date between some days in history.
+ * Get a random date between some days in the past.
  * If [30;5] is specified - that means a random date between 30 and 5 days from now.
  *
  * @param int $days_from
  * @param int $days_to
  *
- * @return string
+ * @return string Random time in 'Y-m-d h:i:s' format.
+ * @throws \Exception
  */
 function bpdd_get_random_date( $days_from = 30, $days_to = 0 ) {
 
@@ -232,7 +234,7 @@ function bpdd_get_random_date( $days_from = 30, $days_to = 0 ) {
 	$date_from = new DateTime( 'now - ' . $days_from . ' days' );
 	$date_to   = new DateTime( 'now - ' . $days_to . ' days' );
 
-	return date( 'Y-m-d H:i:s', mt_rand( $date_from->getTimestamp(), $date_to->getTimestamp() ) );
+	return date( 'Y-m-d H:i:s', wp_rand( $date_from->getTimestamp(), $date_to->getTimestamp() ) );
 }
 
 /**

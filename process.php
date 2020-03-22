@@ -283,6 +283,7 @@ function bpdd_import_users_friends() {
  * @param bool|array $users Users list we want to work with. Get random if empty.
  *
  * @return array
+ * @throws \Exception
  */
 function bpdd_import_groups( $users = false ) {
 
@@ -337,6 +338,7 @@ function bpdd_import_groups( $users = false ) {
  * Import groups activity - aka "status updates".
  *
  * @return int
+ * @throws \Exception
  */
 function bpdd_import_groups_activity() {
 
