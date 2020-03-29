@@ -42,11 +42,10 @@ function bpdd_clear_db() {
 
 	/*
 	 * PRIVATE MESSAGES are not deleted by BuddyPress when user is deleted, for some reason.
-	 * This is a BuddyPress bug, and the fix below will stay here for some time
+	 * This is a BuddyPress bug, and the fix below will stay here for some time.
 	 */
 	$thread_ids = bp_get_option( 'bpdd_imported_user_messages_ids' );
 	if ( ! empty( $thread_ids ) && ! empty( $users_str ) ) {
-		$threads_str = implode( ',', (array) $thread_ids );
 
 		// Finally, remove from the DB completely.
 		foreach ( $thread_ids as $thread_id ) {
@@ -93,6 +92,7 @@ function bpdd_clear_db() {
  * @param array $args Arguments that are passed to bp_activity_add().
  *
  * @return array
+ * @throws \Exception
  */
 function bpdd_groups_join_group_date_fix( $args ) {
 

@@ -147,6 +147,7 @@ function bpdd_import_users_profile() {
  * Import private messages between users.
  *
  * @return array
+ * @throws \Exception
  */
 function bpdd_import_users_messages() {
 
@@ -211,6 +212,7 @@ function bpdd_import_users_messages() {
  * Import Activity - aka "status updates".
  *
  * @return int Number of activity records that were inserted into the database.
+ * @throws \Exception
  */
 function bpdd_import_users_activity() {
 
