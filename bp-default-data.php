@@ -438,13 +438,13 @@ function bpdd_admin_page_content() {
 			<fieldset style="border: 2px solid #ccc;padding: 0 10px;margin-bottom: 10px">
 				<legend style="font-weight: bold;"><?php esc_html_e( 'Usage Tracking', 'bp-default-data' ); ?></legend>
 				<p><?php esc_html_e( 'I want to better understand how people are using this plugin, and for this I need some additional information from you.', 'bp-default-data' ); ?></p>
-				<p><?php esc_html_e( 'Please allow me to collect this information: PHP version, WordPress version, BuddyPress version, list of activated BuddyPress components and its template pack, whether cover image uploads enabled for members and groups, list of selected imported data groups.', 'bp-default-data' ); ?></p>
+				<p><?php esc_html_e( 'Please allow me to collect this information on weekly basis: PHP version, WordPress version, BuddyPress version, list of activated BuddyPress components and its template pack, whether cover image uploads enabled for members and groups, list of selected imported data groups.', 'bp-default-data' ); ?></p>
 				<?php if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) : ?>
 					<p><code><?php echo wp_json_encode( bpdd_ut_request_data() ); ?></code></p>
 				<?php endif; ?>
 				<p>
 					<label>
-						<input type="checkbox" id="usage-tracking" <?php checked( true, (bool) bp_get_option( 'bpdd_usage_tracking_enabled', false ) ); ?>> <?php esc_html_e( 'Allow sending the data listed above, and only that.', 'bp-default-data' ); ?>
+						<input type="checkbox" id="usage-tracking" <?php checked( true, (bool) bp_get_option( 'bpdd_usage_tracking_enabled', false ) ); ?>> <?php esc_html_e( 'Allow sending the data listed above, and only that, once a week.', 'bp-default-data' ); ?>
 					</label>
 				</p>
 			</fieldset>
