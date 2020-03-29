@@ -7,16 +7,22 @@ function bpdd_import_users() {
 
 	$users = array();
 
-	$users_data = require dirname( __FILE__ ) . '/data/users.php';
+	$users_data = require __DIR__ . '/data/users.php';
 
 	foreach ( $users_data as $user ) {
-		$user_id = wp_insert_user( array(
-			                           'user_login'      => $user['login'],
-			                           'user_pass'       => $user['pass'],
-			                           'display_name'    => $user['display_name'],
-			                           'user_email'      => $user['email'],
-			                           'user_registered' => bpdd_get_random_date( 45, 1 ),
-		                           ) );
+		$user_id = wp_insert_user(
+			array(
+				'user_login'      => $user['login'],
+				'user_pass'       => $user['pass'],
+				'display_name'    => $user['display_name'],
+				'user_email'      => $user['email'],
+				'user_registered' => bpdd_get_random_date( 45, 1 ),
+			)
+		);
+
+		if ( is_wp_error( $user_id ) ) {
+			continue;
+		}
 
 		if ( bp_is_active( 'xprofile' ) ) {
 			xprofile_set_field_data( 1, $user_id, $user['display_name'] );
@@ -56,27 +62,31 @@ function bpdd_import_users_profile() {
 
 	$data = array();
 
-	$xprofile_structure = require dirname( __FILE__ ) . '/data/xprofile_structure.php';
+	$xprofile_structure = require __DIR__ . '/data/xprofile_structure.php';
 
 	// Firstly, import profile groups.
 	foreach ( $xprofile_structure as $group_type => $group_data ) {
-		$group_id = xprofile_insert_field_group( array(
-			                                         'name'        => $group_data['name'],
-			                                         'description' => $group_data['desc'],
-		                                         ) );
+		$group_id = xprofile_insert_field_group(
+			array(
+				'name'        => $group_data['name'],
+				'description' => $group_data['desc'],
+			)
+		);
 		$groups[] = $group_id;
 
 		// Then import fields.
 		foreach ( $group_data['fields'] as $field_type => $field_data ) {
-			$field_id = xprofile_insert_field( array(
-				                                   'field_group_id' => $group_id,
-				                                   'parent_id'      => 0,
-				                                   'type'           => $field_type,
-				                                   'name'           => $field_data['name'],
-				                                   'description'    => $field_data['desc'],
-				                                   'is_required'    => $field_data['required'],
-				                                   'order_by'       => 'custom',
-			                                   ) );
+			$field_id = xprofile_insert_field(
+				array(
+					'field_group_id' => $group_id,
+					'parent_id'      => 0,
+					'type'           => $field_type,
+					'name'           => $field_data['name'],
+					'description'    => $field_data['desc'],
+					'is_required'    => $field_data['required'],
+					'order_by'       => 'custom',
+				)
+			);
 
 			if ( $field_id ) {
 				bp_xprofile_update_field_meta( $field_id, 'default_visibility', $field_data['default-visibility'] );
@@ -88,15 +98,17 @@ function bpdd_import_users_profile() {
 				// finally import options
 				if ( ! empty( $field_data['options'] ) ) {
 					foreach ( $field_data['options'] as $option ) {
-						$option_id = xprofile_insert_field( array(
-							                                    'field_group_id'    => $group_id,
-							                                    'parent_id'         => $field_id,
-							                                    'type'              => 'option',
-							                                    'name'              => $option['name'],
-							                                    'can_delete'        => true,
-							                                    'is_default_option' => $option['is_default_option'],
-							                                    'option_order'      => $option['option_order'],
-						                                    ) );
+						$option_id = xprofile_insert_field(
+							array(
+								'field_group_id'    => $group_id,
+								'parent_id'         => $field_id,
+								'type'              => 'option',
+								'name'              => $option['name'],
+								'can_delete'        => true,
+								'is_default_option' => $option['is_default_option'],
+								'option_order'      => $option['option_order'],
+							)
+						);
 
 						$data[ $field_id ]['options'][ $option_id ] = $option['name'];
 					}
@@ -107,7 +119,7 @@ function bpdd_import_users_profile() {
 		}
 	}
 
-	$xprofile_data = require dirname( __FILE__ ) . '/data/xprofile_data.php';
+	$xprofile_data = require __DIR__ . '/data/xprofile_data.php';
 	$users         = bpdd_get_random_users_ids( 0 );
 
 	// Now import profile fields data for all fields for each user.
@@ -147,7 +159,6 @@ function bpdd_import_users_profile() {
  * Import private messages between users.
  *
  * @return array
- * @throws \Exception
  */
 function bpdd_import_users_messages() {
 
@@ -159,47 +170,57 @@ function bpdd_import_users_messages() {
 
 	/** @var $messages_subjects array */
 	/** @var $messages_content array */
-	require dirname( __FILE__ ) . '/data/messages.php';
-
+	require __DIR__ . '/data/messages.php';
 
 	// first level messages
 	for ( $i = 0; $i < 33; $i ++ ) {
-		$messages[] = messages_new_message( array(
-			                                    'sender_id'  => bpdd_get_random_users_ids( 1, 'string' ),
-			                                    'recipients' => bpdd_get_random_users_ids( 1, 'array' ),
-			                                    'subject'    => $messages_subjects[ array_rand( $messages_subjects ) ],
-			                                    'content'    => $messages_content[ array_rand( $messages_content ) ],
-			                                    'date_sent'  => bpdd_get_random_date( 15, 5 ),
-		                                    ) );
+		$messages[] = messages_new_message(
+			array(
+				'sender_id'  => bpdd_get_random_users_ids( 1, 'string' ),
+				'recipients' => bpdd_get_random_users_ids( 1, 'array' ),
+				'subject'    => $messages_subjects[ array_rand( $messages_subjects ) ],
+				'content'    => $messages_content[ array_rand( $messages_content ) ],
+				'date_sent'  => bpdd_get_random_date( 15, 5 ),
+			)
+		);
 	}
 
 	for ( $i = 0; $i < 33; $i ++ ) {
-		$messages[] = messages_new_message( array(
-			                                    'sender_id'  => bpdd_get_random_users_ids( 1, 'string' ),
-			                                    'recipients' => bpdd_get_random_users_ids( 2, 'array' ),
-			                                    'subject'    => $messages_subjects[ array_rand( $messages_subjects ) ],
-			                                    'content'    => $messages_content[ array_rand( $messages_content ) ],
-			                                    'date_sent'  => bpdd_get_random_date( 13, 3 ),
-		                                    ) );
+		$messages[] = messages_new_message(
+			array(
+				'sender_id'  => bpdd_get_random_users_ids( 1, 'string' ),
+				'recipients' => bpdd_get_random_users_ids( 2, 'array' ),
+				'subject'    => $messages_subjects[ array_rand( $messages_subjects ) ],
+				'content'    => $messages_content[ array_rand( $messages_content ) ],
+				'date_sent'  => bpdd_get_random_date( 13, 3 ),
+			)
+		);
 	}
 
 	for ( $i = 0; $i < 33; $i ++ ) {
-		$messages[] = messages_new_message( array(
-			                                    'sender_id'  => bpdd_get_random_users_ids( 1, 'string' ),
-			                                    'recipients' => bpdd_get_random_users_ids( 3, 'array' ),
-			                                    'subject'    => $messages_subjects[ array_rand( $messages_subjects ) ],
-			                                    'content'    => $messages_content[ array_rand( $messages_content ) ],
-			                                    'date_sent'  => bpdd_get_random_date( 10 ),
-		                                    ) );
+		$messages[] = messages_new_message(
+			array(
+				'sender_id'  => bpdd_get_random_users_ids( 1, 'string' ),
+				'recipients' => bpdd_get_random_users_ids( 3, 'array' ),
+				'subject'    => $messages_subjects[ array_rand( $messages_subjects ) ],
+				'content'    => $messages_content[ array_rand( $messages_content ) ],
+				'date_sent'  => bpdd_get_random_date( 10 ),
+			)
+		);
 	}
 
-	$messages[] = messages_new_message( array(
-		                                    'sender_id'  => bpdd_get_random_users_ids( 1, 'string' ),
-		                                    'recipients' => bpdd_get_random_users_ids( 5, 'array' ),
-		                                    'subject'    => $messages_subjects[ array_rand( $messages_subjects ) ],
-		                                    'content'    => $messages_content[ array_rand( $messages_content ) ],
-		                                    'date_sent'  => bpdd_get_random_date( 5 ),
-	                                    ) );
+	$messages[] = messages_new_message(
+		array(
+			'sender_id'  => bpdd_get_random_users_ids( 1, 'string' ),
+			'recipients' => bpdd_get_random_users_ids( 5, 'array' ),
+			'subject'    => $messages_subjects[ array_rand( $messages_subjects ) ],
+			'content'    => $messages_content[ array_rand( $messages_content ) ],
+			'date_sent'  => bpdd_get_random_date( 5 ),
+		)
+	);
+
+	// Get rid of empty values, like failed attempts to import messages.
+	$messages = array_filter( $messages );
 
 	if ( ! empty( $messages ) ) {
 		bp_update_option( 'bpdd_imported_user_messages_ids', $messages );
@@ -212,7 +233,6 @@ function bpdd_import_users_messages() {
  * Import Activity - aka "status updates".
  *
  * @return int Number of activity records that were inserted into the database.
- * @throws \Exception
  */
 function bpdd_import_users_activity() {
 
@@ -225,17 +245,13 @@ function bpdd_import_users_activity() {
 	$users = bpdd_get_random_users_ids( 0 );
 
 	/** @var $activity array */
-	require dirname( __FILE__ ) . '/data/activity.php';
+	require __DIR__ . '/data/activity.php';
 
 	for ( $i = 0; $i < 75; $i ++ ) {
 		$user    = $users[ array_rand( $users ) ];
 		$content = $activity[ array_rand( $activity ) ];
 
-		if ( $bp_activity_id = bp_activity_post_update( array(
-			                                                'user_id' => $user,
-			                                                'content' => $content,
-		                                                ) )
-		) {
+		if ( $bp_activity_id = bp_activity_post_update( array( 'user_id' => $user, 'content' => $content ) ) ) {
 			$bp_activity                = new BP_Activity_Activity( $bp_activity_id );
 			$bp_activity->date_recorded = bpdd_get_random_date( 44 );
 			if ( $bp_activity->save() ) {
@@ -285,7 +301,6 @@ function bpdd_import_users_friends() {
  * @param bool|array $users Users list we want to work with. Get random if empty.
  *
  * @return array
- * @throws \Exception
  */
 function bpdd_import_groups( $users = false ) {
 
@@ -301,19 +316,25 @@ function bpdd_import_groups( $users = false ) {
 		$users = get_users();
 	}
 
-	require dirname( __FILE__ ) . '/data/groups.php';
+	require __DIR__ . '/data/groups.php';
 
 	foreach ( $groups as $group ) {
 		$creator_id = is_object( $users[ array_rand( $users ) ] ) ? $users[ array_rand( $users ) ]->ID : $users[ array_rand( $users ) ];
-		$cur        = groups_create_group( array(
-			                                   'creator_id'   => $creator_id,
-			                                   'name'         => $group['name'],
-			                                   'description'  => $group['description'],
-			                                   'slug'         => groups_check_slug( sanitize_title( esc_attr( $group['name'] ) ) ),
-			                                   'status'       => $group['status'],
-			                                   'date_created' => bpdd_get_random_date( 30, 5 ),
-			                                   'enable_forum' => $group['enable_forum'],
-		                                   ) );
+		$cur        = groups_create_group(
+			array(
+				'creator_id'   => $creator_id,
+				'name'         => $group['name'],
+				'description'  => $group['description'],
+				'slug'         => groups_check_slug( sanitize_title( esc_attr( $group['name'] ) ) ),
+				'status'       => $group['status'],
+				'date_created' => bpdd_get_random_date( 30, 5 ),
+				'enable_forum' => $group['enable_forum'],
+			)
+		);
+
+		if ( ! $cur ) {
+			continue;
+		}
 
 		groups_update_groupmeta( $cur, 'last_activity', bpdd_get_random_date( 10 ) );
 
@@ -340,7 +361,6 @@ function bpdd_import_groups( $users = false ) {
  * Import groups activity - aka "status updates".
  *
  * @return int
- * @throws \Exception
  */
 function bpdd_import_groups_activity() {
 
@@ -354,7 +374,7 @@ function bpdd_import_groups_activity() {
 	$groups = bpdd_get_random_groups_ids( 0 );
 
 	/** @var $activity array */
-	require dirname( __FILE__ ) . '/data/activity.php';
+	require __DIR__ . '/data/activity.php';
 
 	for ( $i = 0; $i < 150; $i ++ ) {
 		$user_id  = $users[ array_rand( $users ) ];
@@ -365,12 +385,15 @@ function bpdd_import_groups_activity() {
 			continue;
 		}
 
-		if ( $bp_activity_id = groups_post_update( array(
-			                                           'user_id'  => $user_id,
-			                                           'group_id' => $group_id,
-			                                           'content'  => $content,
-		                                           ) )
-		) {
+		$bp_activity_id = groups_post_update(
+			array(
+				'user_id'  => $user_id,
+				'group_id' => $group_id,
+				'content'  => $content,
+			)
+		);
+
+		if ( $bp_activity_id ) {
 			$bp_activity                = new BP_Activity_Activity( $bp_activity_id );
 			$bp_activity->date_recorded = bpdd_get_random_date( 29 );
 			if ( $bp_activity->save() ) {
@@ -385,11 +408,11 @@ function bpdd_import_groups_activity() {
 /**
  * Import groups members.
  *
- * @param bool $groups We can import random groups or work with a predefined list.
+ * @param array $groups We can import random groups or work with a predefined list.
  *
  * @return array
  */
-function bpdd_import_groups_members( $groups = false ) {
+function bpdd_import_groups_members( $groups = array() ) {
 
 	$members = array();
 
@@ -397,7 +420,7 @@ function bpdd_import_groups_members( $groups = false ) {
 		return $members;
 	}
 
-	if ( ! $groups ) {
+	if ( empty( $groups ) ) {
 		$groups = bpdd_get_random_groups_ids( 0 );
 	}
 

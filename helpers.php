@@ -222,7 +222,6 @@ function bpdd_get_random_users_ids( $count = 1, $output = 'array' ) {
  * @param int $days_to
  *
  * @return string Random time in 'Y-m-d h:i:s' format.
- * @throws \Exception
  */
 function bpdd_get_random_date( $days_from = 30, $days_to = 0 ) {
 
@@ -231,10 +230,16 @@ function bpdd_get_random_date( $days_from = 30, $days_to = 0 ) {
 		$days_to = $days_from - 1;
 	}
 
-	$date_from = new DateTime( 'now - ' . $days_from . ' days' );
-	$date_to   = new DateTime( 'now - ' . $days_to . ' days' );
+	try {
+		$date_from = new DateTime( 'now - ' . $days_from . ' days' );
+		$date_to   = new DateTime( 'now - ' . $days_to . ' days' );
 
-	return date( 'Y-m-d H:i:s', wp_rand( $date_from->getTimestamp(), $date_to->getTimestamp() ) );
+		$date = date( 'Y-m-d H:i:s', wp_rand( $date_from->getTimestamp(), $date_to->getTimestamp() ) );
+	} catch ( Exception $e ) {
+		$date = date( 'Y-m-d H:i:s' );
+	}
+
+	return $date;
 }
 
 /**

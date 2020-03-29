@@ -1,9 +1,11 @@
 === BuddyPress Default Data ===
 Contributors: slaFFik
-Tags: buddypress, import, bulk import, members, groups, messages, activity, forums, friends
+Tags: buddypress, import, bulk import, demo data, members, groups, messages, activity, forums, friends
 Requires at least: 4.4
 Tested up to: 5.4
 Stable tag: 1.3.0
+Requires PHP: 5.3
+License: GNU General Public License v2.0 or later
 
 Plugin will create lots of users, messages, friends connections, groups, topics, activity items, profile data - useful for testing purpose.
 
@@ -49,7 +51,7 @@ That's it!
 
 = 1.3.0 (29.03.2020) =
 * Checked and fixed compatibility with BuddyPress 5.x.
-* Fixed several PHP Warnings and notices.
+* Fixed several PHP catchable fatal errors, warnings and notices in importing logic.
 * Added optional (off by default) usage tracking option. All the details are in plugin admin area.
 
 = 1.2.0 (17.05.2017) =
