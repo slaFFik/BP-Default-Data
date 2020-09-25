@@ -2,8 +2,8 @@
 Contributors: slaFFik
 Tags: buddypress, import, bulk import, demo data, members, groups, messages, activity, forums, friends
 Requires at least: 4.4
-Tested up to: 5.4
-Stable tag: 1.3.0
+Tested up to: 5.5
+Stable tag: 1.3.1
 Requires PHP: 5.3
 License: GNU General Public License v2.0 or later
 
@@ -48,6 +48,10 @@ That's it!
 1. Admin Page with Import Status
 
 == Changelog ==
+
+= 1.3.1 (25.09.2020) =
+* Checked compatibility with BuddyPress 6.x.
+* Removed usage tracking.
 
 = 1.3.0 (29.03.2020) =
 * Checked and fixed compatibility with BuddyPress 5.x.
