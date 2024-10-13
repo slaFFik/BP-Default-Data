@@ -1,8 +1,8 @@
 === BuddyPress Default Data ===
 Contributors: slaFFik
-Tags: buddypress, import, bulk import, demo data, members, groups, messages, activity, forums, friends
+Tags: buddypress, import, bulk import, demo data, test data
 Requires at least: 4.4
-Tested up to: 5.5
+Tested up to: 6.7
 Stable tag: 1.3.1
 Requires PHP: 5.3
 License: GNU General Public License v2.0 or later
