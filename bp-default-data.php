@@ -40,10 +40,14 @@ add_action( 'bp_loaded', 'bpdd_init' );
  */
 function bpdd_load_plugin_textdomain() {
 
+	if ( is_textdomain_loaded( 'bp-default-data' ) ) {
+		return;
+	}
+
 	load_plugin_textdomain( 'bp-default-data' );
 }
 
-add_action( 'plugins_loaded', 'bpdd_load_plugin_textdomain' );
+add_action( 'bp_loaded', 'bpdd_load_plugin_textdomain' );
 
 /**
  * Add the Settings link for the plugin on Plugins page in wp-admin area.
