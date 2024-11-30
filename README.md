@@ -1,6 +1,6 @@
 # BuddyPress Default Data
 
-Plugin will create lots of users, messages, friends connections, groups, topics, activity items, profile data - useful for testing purpose.
+Plugin will create 25 new users, hundreds of messages (within threads), friends connections, groups, topics, activity items, profile data - useful for testing purpose.
 
 ## Description
 
