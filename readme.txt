@@ -45,7 +45,12 @@ That's it!
 
 == Screenshots ==
 
-1. Admin Page with Import Status
+1. Admin Page with Import Status.
+2. Activity feed with imported personal and group messages.
+3. User profile with filled-in xProfile fields.
+4. List of messages between generated users.
+5. List of generated groups with descriptions, members and activity.
+6. List of generated users with their last activity dates.
 
 == Changelog ==
 
