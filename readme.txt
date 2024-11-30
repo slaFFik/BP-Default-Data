@@ -3,7 +3,7 @@ Contributors: slaFFik
 Tags: buddypress, import, groups, messages, users
 Requires at least: 4.4
 Tested up to: 6.7
-Stable tag: 1.3.1
+Stable tag: 1.3.2
 Requires PHP: 5.3
 License: GNU General Public License v2.0 or later
 
@@ -48,6 +48,11 @@ That's it!
 1. Admin Page with Import Status
 
 == Changelog ==
+
+= 1.3.2 (30.11.2024) =
+* Checked compatibility with WordPress 6.7.
+* Checked compatibility with BuddyPress 14.x.
+* Removed requirements library, plugin now uses built-in WordPress functionality.
 
 = 1.3.1 (25.09.2020) =
 * Checked compatibility with BuddyPress 6.x.
