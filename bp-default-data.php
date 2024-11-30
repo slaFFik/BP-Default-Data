@@ -5,7 +5,7 @@
  * Description:       Create lots of users, groups, activity items, messages, profile data - useful for BuddyPress testing purpose.
  * Author:            slaFFik
  * Author URI:        https://ovirium.com
- * Version:           1.3.2
+ * Version:           1.4.0
  * Requires at least: 4.4
  * Requires PHP:      5.3
  * Requires Plugins:  buddypress
@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'BPDD_VERSION', '1.3.2' );
+define( 'BPDD_VERSION', '1.4.0' );
 
 require_once __DIR__ . '/helpers.php';
 

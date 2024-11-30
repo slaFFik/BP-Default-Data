@@ -3,7 +3,7 @@ Contributors: slaFFik
 Tags: buddypress, import, groups, messages, users
 Requires at least: 4.4
 Tested up to: 6.7
-Stable tag: 1.3.2
+Stable tag: 1.4.0
 Requires PHP: 5.3
 License: GNU General Public License v2.0 or later
 
@@ -49,10 +49,11 @@ That's it!
 
 == Changelog ==
 
-= 1.3.2 (30.11.2024) =
+= 1.4.0 (30.11.2024) =
 * Checked compatibility with WordPress 6.7.
 * Checked compatibility with BuddyPress 14.x.
-* Removed requirements library, plugin now uses built-in WordPress functionality.
+* Removed requirements library, plugin now uses built-in WordPress functionality. Now the plugin loads less code.
+* Fixed "headers already sent" error when importing messages.
 
 = 1.3.1 (25.09.2020) =
 * Checked compatibility with BuddyPress 6.x.
