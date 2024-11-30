@@ -19,18 +19,20 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 define( 'BPDD_VERSION', '1.3.2' );
 
+require_once __DIR__ . '/helpers.php';
+
 /**
  * Load the plugin admin area registration hook.
  */
 function bpdd_init() {
 
-	require_once __DIR__ . '/helpers.php';
-
-	add_action( bp_core_admin_hook(), 'bpdd_admin_page', 99 );
 	add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), 'bpdd_plugins_settings_link' );
 }
 
-add_action( 'bp_loaded', 'bpdd_init' );
+add_action( 'admin_init', 'bpdd_init' );
+
+add_action( 'admin_menu', 'bpdd_admin_page', 99 );
+add_action( 'admin_init', 'bpdd_admin_page_process', 99 );
 
 /**
  * Make the plugin translatable.
@@ -78,6 +80,7 @@ function bpdd_admin_page() {
 		'bpdd_admin_page_content'
 	);
 
+	// Remove old obsolete Usage Tracking scheduled event.
 	if ( wp_next_scheduled( 'bpdd_ut_weekly_request' ) ) {
 		wp_clear_scheduled_hook( 'bpdd_ut_weekly_request' );
 		bp_delete_option( 'bpdd_usage_tracking_enabled' );
@@ -87,7 +90,11 @@ function bpdd_admin_page() {
 /**
  * Display the admin area page.
  */
-function bpdd_admin_page_content() {
+function bpdd_admin_page_content() { // phpcs:ignore Generic.Metrics.CyclomaticComplexity.MaxExceeded
+
+	global $bpdd_imported;
+
+	$imported = is_array( $bpdd_imported ) ? $bpdd_imported : [];
 	?>
 
 	<div class="wrap" id="bp-default-data-page">
@@ -107,104 +114,21 @@ function bpdd_admin_page_content() {
 				margin-left: 25px
 			}
 		</style>
-		<h1><?php esc_html_e( 'BuddyPress Default Data', 'bp-default-data' ); ?> <sup>v<?php echo BPDD_VERSION; ?></sup></h1>
+
+		<h1>
+			<?php esc_html_e( 'BuddyPress Default Data', 'bp-default-data' ); ?> <sup>v<?php echo esc_html( BPDD_VERSION ); ?></sup>
+		</h1>
 
 		<?php
-		if ( ! empty( $_POST['bpdd-admin-clear'] ) ) {
+		if ( ! empty( $_POST['bpdd-admin-clear'] ) ) :
 			bpdd_clear_db();
-			echo '<div id="message" class="updated fade"><p>' . esc_html__( 'Everything created by this plugin was successfully deleted.', 'bp-default-data' ) . '</p></div>';
-		}
-
-		if ( isset( $_POST['bpdd-admin-submit'] ) ) {
-			// Cound what we have just imported.
-			$imported = [];
-
-			// Check nonce before we do anything.
-			check_admin_referer( 'bpdd-admin' );
-
-			include_once __DIR__ . '/process.php';
-
-			// Import users
-			if ( isset( $_POST['bpdd']['import-users'] ) && ! bpdd_is_imported( 'users', 'users' ) ) {
-				$users             = bpdd_import_users();
-				$imported['users'] = sprintf( /* translators: formatted number. */
-					esc_html__( '%s new users', 'bp-default-data' ),
-					number_format_i18n( count( $users ) )
-				);
-				bpdd_update_import( 'users', 'users' );
-			}
-
-			if ( isset( $_POST['bpdd']['import-profile'] ) && ! bpdd_is_imported( 'users', 'xprofile' ) ) {
-				$profile             = bpdd_import_users_profile();
-				$imported['profile'] = sprintf( /* translators: formatted number. */
-					esc_html__( '%s profile entries', 'bp-default-data' ),
-					number_format_i18n( $profile )
-				);
-				bpdd_update_import( 'users', 'xprofile' );
-			}
-
-			if ( isset( $_POST['bpdd']['import-friends'] ) && ! bpdd_is_imported( 'users', 'friends' ) ) {
-				$friends             = bpdd_import_users_friends();
-				$imported['friends'] = sprintf( /* translators: formatted number. */
-					esc_html__( '%s friends connections', 'bp-default-data' ),
-					number_format_i18n( $friends )
-				);
-				bpdd_update_import( 'users', 'friends' );
-			}
-
-			if ( isset( $_POST['bpdd']['import-messages'] ) && ! bpdd_is_imported( 'users', 'messages' ) ) {
-				$messages             = bpdd_import_users_messages();
-				$imported['messages'] = sprintf( /* translators: formatted number. */
-					esc_html__( '%s private messages', 'bp-default-data' ),
-					number_format_i18n( count( $messages ) )
-				);
-				bpdd_update_import( 'users', 'messages' );
-			}
-
-			if ( isset( $_POST['bpdd']['import-activity'] ) && ! bpdd_is_imported( 'users', 'activity' ) ) {
-				$activity             = bpdd_import_users_activity();
-				$imported['activity'] = sprintf( /* translators: formatted number. */
-					esc_html__( '%s personal activity items', 'bp-default-data' ),
-					number_format_i18n( $activity )
-				);
-				bpdd_update_import( 'users', 'activity' );
-			}
-
-			// Import groups
-			if ( isset( $_POST['bpdd']['import-groups'] ) && ! bpdd_is_imported( 'groups', 'groups' ) ) {
-				$groups             = bpdd_import_groups();
-				$imported['groups'] = sprintf( /* translators: formatted number. */
-					esc_html__( '%s new groups', 'bp-default-data' ),
-					number_format_i18n( count( $groups ) )
-                    /* translators: formatted number. */
-                );
-				bpdd_update_import( 'groups', 'groups' );
-			}
-			if ( isset( $_POST['bpdd']['import-g-members'] ) && ! bpdd_is_imported( 'groups', 'members' ) ) {
-				$g_members             = bpdd_import_groups_members();
-				$imported['g_members'] = sprintf( /* translators: formatted number. */
-					esc_html__( '%s groups members (1 user can be in several groups)', 'bp-default-data' ),
-					number_format_i18n( count( $g_members ) )
-				);
-				bpdd_update_import( 'groups', 'members' );
-			}
-
-			// if ( isset( $_POST['bpdd']['import-forums'] ) && ! bpdd_is_imported( 'groups', 'forums' ) ) {
-			// $forums             = bpdd_import_groups_forums( $groups );
-			// $imported['forums'] = sprintf( __( '%s groups forum topics', 'bp-default-data' ), number_format_i18n( count( $forums ) ) );
-			// bpdd_update_import( 'groups', 'forums' );
-			// }
-
-			if ( isset( $_POST['bpdd']['import-g-activity'] ) && ! bpdd_is_imported( 'groups', 'activity' ) ) {
-				$g_activity             = bpdd_import_groups_activity();
-				$imported['g_activity'] = sprintf( /* translators: formatted number. */
-					esc_html__( '%s groups activity items', 'bp-default-data' ),
-					number_format_i18n( $g_activity )
-				);
-				bpdd_update_import( 'groups', 'activity' );
-			}
 			?>
+			<div id="message" class="updated fade">
+				<p><?php esc_html_e( 'Everything created by this plugin was successfully deleted.', 'bp-default-data' ); ?></p>
+			</div>
+		<?php endif; ?>
 
+		<?php if ( isset( $_POST['bpdd-admin-submit'] ) ) : ?>
 			<div id="message" class="updated fade">
 				<p>
 					<?php
@@ -217,10 +141,7 @@ function bpdd_admin_page_content() {
                     ?>
 				</p>
 			</div>
-
-			<?php
-		}
-        ?>
+		<?php endif; ?>
 
 		<form action="" method="post" id="bpdd-admin-form">
 			<script type="text/javascript">
@@ -401,4 +322,112 @@ function bpdd_admin_page_content() {
 		<!-- #bpdd-admin-form -->
 	</div><!-- .wrap -->
 	<?php
+}
+
+/**
+ * Process the form action.
+ */
+function bpdd_admin_page_process() {
+
+	global $bpdd_imported;
+
+	// Count what we have just imported.
+	$bpdd_imported = [];
+
+	if ( ! isset( $_POST['bpdd-admin-submit'] ) ) {
+		return;
+	}
+
+	// Check nonce before we do anything.
+	check_admin_referer( 'bpdd-admin' );
+
+	include_once __DIR__ . '/process.php';
+
+	// Import users.
+	if ( isset( $_POST['bpdd']['import-users'] ) && ! bpdd_is_imported( 'users', 'users' ) ) {
+		$users                  = bpdd_import_users();
+		$bpdd_imported['users'] = sprintf( /* translators: %s - formatted number. */
+			esc_html__( '%s new users', 'bp-default-data' ),
+			number_format_i18n( count( $users ) )
+		);
+
+		bpdd_update_import( 'users', 'users' );
+	}
+
+	if ( isset( $_POST['bpdd']['import-profile'] ) && ! bpdd_is_imported( 'users', 'xprofile' ) ) {
+		$profile                  = bpdd_import_users_profile();
+		$bpdd_imported['profile'] = sprintf( /* translators: %s - formatted number. */
+			esc_html__( '%s profile entries', 'bp-default-data' ),
+			number_format_i18n( $profile )
+		);
+
+		bpdd_update_import( 'users', 'xprofile' );
+	}
+
+	if ( isset( $_POST['bpdd']['import-friends'] ) && ! bpdd_is_imported( 'users', 'friends' ) ) {
+		$friends                  = bpdd_import_users_friends();
+		$bpdd_imported['friends'] = sprintf( /* translators: %s - formatted number. */
+			esc_html__( '%s friends connections', 'bp-default-data' ),
+			number_format_i18n( $friends )
+		);
+
+		bpdd_update_import( 'users', 'friends' );
+	}
+
+	if ( isset( $_POST['bpdd']['import-messages'] ) && ! bpdd_is_imported( 'users', 'messages' ) ) {
+		$messages                  = bpdd_import_users_messages();
+		$bpdd_imported['messages'] = sprintf( /* translators: %s - formatted number. */
+			esc_html__( '%s private messages', 'bp-default-data' ),
+			number_format_i18n( count( $messages ) )
+		);
+
+		bpdd_update_import( 'users', 'messages' );
+	}
+
+	if ( isset( $_POST['bpdd']['import-activity'] ) && ! bpdd_is_imported( 'users', 'activity' ) ) {
+		$activity                  = bpdd_import_users_activity();
+		$bpdd_imported['activity'] = sprintf( /* translators: %s - formatted number. */
+			esc_html__( '%s personal activity items', 'bp-default-data' ),
+			number_format_i18n( $activity )
+		);
+
+		bpdd_update_import( 'users', 'activity' );
+	}
+
+	// Import groups.
+	if ( isset( $_POST['bpdd']['import-groups'] ) && ! bpdd_is_imported( 'groups', 'groups' ) ) {
+		$groups                  = bpdd_import_groups();
+		$bpdd_imported['groups'] = sprintf( /* translators: %s - formatted number. */
+			esc_html__( '%s new groups', 'bp-default-data' ),
+			number_format_i18n( count( $groups ) )
+		/* translators: formatted number. */
+		);
+
+		bpdd_update_import( 'groups', 'groups' );
+	}
+	if ( isset( $_POST['bpdd']['import-g-members'] ) && ! bpdd_is_imported( 'groups', 'members' ) ) {
+		$g_members                  = bpdd_import_groups_members();
+		$bpdd_imported['g_members'] = sprintf( /* translators: %s - formatted number. */
+			esc_html__( '%s groups members (1 user can be in several groups)', 'bp-default-data' ),
+			number_format_i18n( count( $g_members ) )
+		);
+
+		bpdd_update_import( 'groups', 'members' );
+	}
+
+	// if ( isset( $_POST['bpdd']['import-forums'] ) && ! bpdd_is_imported( 'groups', 'forums' ) ) {
+	// $forums             = bpdd_import_groups_forums( $groups );
+	// $bpdd_imported['forums'] = sprintf( __( '%s groups forum topics', 'bp-default-data' ), number_format_i18n( count( $forums ) ) );
+	// bpdd_update_import( 'groups', 'forums' );
+	// }
+
+	if ( isset( $_POST['bpdd']['import-g-activity'] ) && ! bpdd_is_imported( 'groups', 'activity' ) ) {
+		$g_activity                  = bpdd_import_groups_activity();
+		$bpdd_imported['g_activity'] = sprintf( /* translators: formatted number. */
+			esc_html__( '%s groups activity items', 'bp-default-data' ),
+			number_format_i18n( $g_activity )
+		);
+
+		bpdd_update_import( 'groups', 'activity' );
+	}
 }

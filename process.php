@@ -182,6 +182,7 @@ function bpdd_import_users_messages() {
 				'subject'    => $messages_subjects[ array_rand( $messages_subjects ) ],
 				'content'    => $messages_content[ array_rand( $messages_content ) ],
 				'date_sent'  => bpdd_get_random_date( 15, 5 ),
+				'error_type' => 'wp_error',
 			]
 		);
 	}
@@ -194,6 +195,7 @@ function bpdd_import_users_messages() {
 				'subject'    => $messages_subjects[ array_rand( $messages_subjects ) ],
 				'content'    => $messages_content[ array_rand( $messages_content ) ],
 				'date_sent'  => bpdd_get_random_date( 13, 3 ),
+				'error_type' => 'wp_error',
 			]
 		);
 	}
@@ -206,6 +208,7 @@ function bpdd_import_users_messages() {
 				'subject'    => $messages_subjects[ array_rand( $messages_subjects ) ],
 				'content'    => $messages_content[ array_rand( $messages_content ) ],
 				'date_sent'  => bpdd_get_random_date( 10 ),
+				'error_type' => 'wp_error',
 			]
 		);
 	}
@@ -217,6 +220,7 @@ function bpdd_import_users_messages() {
 			'subject'    => $messages_subjects[ array_rand( $messages_subjects ) ],
 			'content'    => $messages_content[ array_rand( $messages_content ) ],
 			'date_sent'  => bpdd_get_random_date( 5 ),
+			'error_type' => 'wp_error',
 		]
 	);
 
