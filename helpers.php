@@ -22,6 +22,7 @@ function bpdd_clear_db() {
 	 * Groups
 	 */
 	$groups = bp_get_option( 'bpdd_imported_group_ids' );
+
 	if ( ! empty( $groups ) ) {
 		foreach ( (array) $groups as $group_id ) {
 			groups_delete_group( $group_id );
@@ -32,6 +33,7 @@ function bpdd_clear_db() {
 	 * Users and all their data.
 	 */
 	$users = bp_get_option( 'bpdd_imported_user_ids' );
+
 	if ( ! empty( $users ) ) {
 		$users_str = implode( ',', (array) $users );
 
@@ -50,16 +52,22 @@ function bpdd_clear_db() {
 		// Finally, remove from the DB completely.
 		foreach ( $thread_ids as $thread_id ) {
 			// Get the message ids in order to delete their metas.
-			$message_ids = $wpdb->get_col( $wpdb->prepare(
-				"SELECT id FROM {$bp->messages->table_name_messages} 
-				WHERE thread_id = %d",
-				$thread_id ) );
+			$message_ids = $wpdb->get_col(
+				$wpdb->prepare(
+					"SELECT id FROM {$bp->messages->table_name_messages}
+					WHERE thread_id = %d",
+					$thread_id
+				)
+			);
 
 			// Delete all the messages.
-			$wpdb->query( $wpdb->prepare(
-				"DELETE FROM {$bp->messages->table_name_messages} 
-				WHERE thread_id = %d",
-				$thread_id ) );
+			$wpdb->query(
+				$wpdb->prepare(
+					"DELETE FROM {$bp->messages->table_name_messages}
+					WHERE thread_id = %d",
+					$thread_id
+				)
+			);
 
 			// Delete message meta.
 			foreach ( $message_ids as $message_id ) {
@@ -67,10 +75,13 @@ function bpdd_clear_db() {
 			}
 
 			// Delete all the recipients.
-			$wpdb->query( $wpdb->prepare(
-				"DELETE FROM {$bp->messages->table_name_recipients} 
+			$wpdb->query(
+                $wpdb->prepare(
+                    "DELETE FROM {$bp->messages->table_name_recipients}
 				WHERE thread_id = %d",
-				$thread_id ) );
+                    $thread_id
+                )
+            );
 		}
 	}
 
@@ -133,13 +144,15 @@ function bpdd_get_random_groups_ids( $count = 1, $output = 'array' ) {
 
 	if ( ! empty( $groups_arr ) ) {
 		$total_groups = count( $groups_arr );
+
 		if ( $count <= 0 || $count > $total_groups ) {
 			$count = $total_groups;
 		}
 
 		// Get random groups.
 		$random_keys = (array) array_rand( $groups_arr, $count );
-		$groups      = array();
+		$groups      = [];
+
 		foreach ( $groups_arr as $key => $value ) {
 			if ( in_array( $key, $random_keys, true ) ) {
 				$groups[] = $value;
@@ -150,6 +163,7 @@ function bpdd_get_random_groups_ids( $count = 1, $output = 'array' ) {
 		$bp = buddypress();
 
 		$limit = '';
+
 		if ( $count > 0 ) {
 			$limit = 'LIMIT ' . (int) $count;
 		}
@@ -183,23 +197,27 @@ function bpdd_get_random_users_ids( $count = 1, $output = 'array' ) {
 
 	if ( ! empty( $users_arr ) ) {
 		$total_members = count( $users_arr );
+
 		if ( $count <= 0 || $count > $total_members ) {
 			$count = $total_members;
 		}
 
 		// Get random users.
 		$random_keys = (array) array_rand( $users_arr, $count );
-		$users       = array();
+		$users       = [];
+
 		foreach ( $users_arr as $key => $value ) {
-			if ( in_array( $key, $random_keys ) ) {
+			if ( in_array( $key, $random_keys, true ) ) {
 				$users[] = $value;
 			}
 		}
 	} else {
 		// Get by default (if no users were imported) all currently registered users.
-		$users = get_users( array(
-			                    'fields' => 'ID',
-		                    ) );
+		$users = get_users(
+			[
+				'fields' => 'ID',
+			]
+		);
 	}
 
 	/*
@@ -252,7 +270,6 @@ function bpdd_get_time() {
 	return (int) current_time( 'timestamp' );
 }
 
-
 /**
  * Check whether something was imported or not.
  *
@@ -266,7 +283,7 @@ function bpdd_is_imported( $group, $import ) {
 	$group  = sanitize_key( $group );
 	$import = sanitize_key( $import );
 
-	if ( ! in_array( $group, array( 'users', 'groups' ) ) ) {
+	if ( ! in_array( $group, [ 'users', 'groups' ] ) ) {
 		return false;
 	}
 
@@ -284,7 +301,7 @@ function bpdd_imported_disabled( $group, $import ) {
 	$group  = sanitize_key( $group );
 	$import = sanitize_key( $import );
 
-	if ( ! in_array( $group, array( 'users', 'groups' ) ) ) {
+	if ( ! in_array( $group, [ 'users', 'groups' ], true ) ) {
 		echo '';
 	}
 
@@ -304,11 +321,11 @@ function bpdd_update_import( $group, $import ) {
 	$group  = sanitize_key( $group );
 	$import = sanitize_key( $import );
 
-	if ( ! in_array( $group, array( 'users', 'groups' ) ) ) {
+	if ( ! in_array( $group, [ 'users', 'groups' ], true ) ) {
 		return false;
 	}
 
-	$values            = bp_get_option( 'bpdd_import_' . $group, array() );
+	$values            = bp_get_option( 'bpdd_import_' . $group, [] );
 	$values[ $import ] = bpdd_get_time();
 
 	return bp_update_option( 'bpdd_import_' . $group, $values );
